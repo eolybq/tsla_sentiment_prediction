@@ -1,0 +1,1 @@
+Final project for CARA course. This project evaluates different basic approaches on predictions of real world stocks prices data. There are models as simpel as ARIMA reachiong to VAR model including financial indicators as inputs.
