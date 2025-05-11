@@ -4,6 +4,7 @@ library(TTR)
 
 rawdata <- tq_get("TSLA", from = "2010-06-01", to = "2025-05-01")
 
+save(rawdata, file = "data/rawdata/tsla_quant.RData")
 
 
 # ============================
@@ -54,4 +55,6 @@ rawdata$stochrsi <- stochRSI(rawdata$close, n = 14, maType = "SMA")
 
 # Sila trendu bez smeru
 adx <- ADX(cbind(rawdata$high, rawdata$low, rawdata$close), n = 14)
-rawdata$adx <- adx$ADX
+rawdata$adx <- adx[, 4]
+
+save(rawdata, file = "data/tsla_quant_indicators.RData")
