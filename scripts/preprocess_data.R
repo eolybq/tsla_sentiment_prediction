@@ -1,6 +1,7 @@
 library(tidyverse)
 library(tidyquant)
 library(TTR)
+library(trendecon)
 
 rm(list = ls())
 
@@ -71,11 +72,12 @@ save(indicator_data, file = "data/cleandata/tsla_quant_indicators.RData")
 
 # TRENDS + TWEETS DATA ==================
 
-# TODO: DAILY normalizovane hodnoty z baliku trendecon z Google trends api
-library(trendecon)
-ts_gtrends_mwd("tesla", geo = "US", from = "2010-01-01")
+# NOTE: DAILY normalizovane hodnoty z baliku trendecon z Google trends api
+daily_tesla_trends_data <- ts_gtrends_mwd("tesla", geo = "US", from = "2010-06-01")
 
+save(daily_tesla_trends_data, file = "data/cleandata/daily_tesla_trends.RData")
 
+# NOTE: stazene primo z Google trends !!!! MONTHLY
 tesla_trends <- read_csv(
     "data/rawdata/tesla_trends.csv",
     skip = 3,
@@ -83,7 +85,6 @@ tesla_trends <- read_csv(
 )
 
 save(tesla_trends, file = "data/cleandata/tesla_trends.RData")
-
 
 # NOTE: Korelace s tesla_trends = 0.9042762 takže asi whatever co použiju
 #tsla_trends <- read_csv("data/rawdata/tsla_trends.csv", skip = 1)
@@ -160,6 +161,8 @@ tweets_tsla <- elon_tweets |>
         )
     )) |>
     arrange(date)
+
+write_csv(tweets_tsla, "data/rawdata/tweets_tsla_not_agregated.csv")
 
 # agregace vsech tweetu na denní frekvenci
 tweets_tsla_daily <- tweets_tsla |>
