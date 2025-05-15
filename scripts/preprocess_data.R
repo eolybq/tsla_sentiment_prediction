@@ -224,8 +224,6 @@ walk(clean_data_list, ~load(.x, envir = .GlobalEnv))
 walk(ls(), ~print(get(.)))
 
 
-
-# FIX: az moc pipes asi bloku
 tibble_data <- indicator_data |>
     left_join(
         vix_data_clean |>
@@ -236,7 +234,7 @@ tibble_data <- indicator_data |>
         sentiment_daily |>
             mutate(
                 tweets_sentiment = replace_na(sentiment, "none"),
-                tweets_sentiment = factor(tweets_sentiment, levels = c("none", "neutral", "positive", "negative")))
+                tweets_sentiment = factor(tweets_sentiment, levels = c("none", "neutral", "positive", "negative"))
             ) |>
             select(date, tweets_sentiment),
         by = "date"
