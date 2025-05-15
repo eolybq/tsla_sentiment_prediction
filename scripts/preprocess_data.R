@@ -209,3 +209,38 @@ vix_data_clean <- vix_data |>
     select(-c(symbol, volume))
 
 save(vix_data_clean, file = "data/cleandata/vix.RData")
+
+
+
+
+
+
+
+# SPOJENI DAT DO JEDNOHO TIBBLE ================
+clean_data_list <- dir("data/cleandata", full.names = TRUE)
+walk(clean_data_list, ~load(.x, envir = .GlobalEnv))
+
+# Print všech data jednotlivě
+walk(ls(), ~print(get(.)))
+
+
+
+# FIX: az moc pipes asi bloku
+tibble_data <- indicator_data |>
+    left_join(
+        vix_data_clean |>
+            select(date, vix_close = close),
+        by = "date"
+    ) |>
+    left_join(
+        sentiment_daily |>
+            mutate(
+                tweets_sentiment = replace_na(sentiment, "none"),
+                tweets_sentiment = factor(tweets_sentiment, levels = c("none", "neutral", "positive", "negative")))
+            ) |>
+            select(date, tweets_sentiment),
+        by = "date"
+    ) |>
+    # left_join(daily_tesla_trends_data, by = "date") |>
+    # left_join(tesla_trends, by = "date") |>
+    # left_join(sent_surv_clean, by = "date") |>
