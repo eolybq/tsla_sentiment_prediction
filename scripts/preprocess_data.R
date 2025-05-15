@@ -1,4 +1,5 @@
 library(tidyverse)
+library(readxl)
 library(tidyquant)
 library(TTR)
 library(trendecon)
@@ -8,11 +9,10 @@ rm(list = ls())
 
 # STOCK DATA + INDICATORS ===============
 # Stažení historických dat pro TSLA
-# rawdata <- tq_get("TSLA", from = "2010-06-01", to = "2025-05-01")
+rawdata <- tq_get("TSLA", from = "2010-06-01", to = "2025-05-01")
+rawdata <- rawdata |>
+    select(-symbol)
 
-# save(rawdata, file = "data/rawdata/tsla_quant.RData")
-
-load("data/rawdata/tsla_quant.RData")
 
 
 # ============================
@@ -41,26 +41,29 @@ indicator_data$ema_20 <- EMA(rawdata$close, n = 20)
 indicator_data$basic_volatility <- rawdata$high - rawdata$low
 
 # Průměrný rozsah cenového pohybu včetně gapů, přesnější měření volatility než basic_volatility. Měří tržní riziko; vyšší ATR = vyšší riziko.
-indicator_data$atr <- ATR(cbind(rawdata$high, rawdata$low, rawdata$close), n = 14)$atr
+indicator_data$atr <- ATR(cbind(rawdata$high, rawdata$low, rawdata$close), n = 14)[, 2]
 
 # Indikátor momenta, který měří poměr kladných vs. záporných výnosů za určité období
 indicator_data$rsi <- RSI(rawdata$close, n = 14)
 
 # Rozdíl mezi dvěma EMA (např. 12 a 26 dní) + signální čára (9denní EMA). Sleduje sílu a směr trendu. MACD překročí signal line směrem nahoru = nákupní signál. Směrem dolů = prodejní signál.
 macd <- MACD(rawdata$close, nFast = 12, nSlow = 26, nSig = 9)
-indicator_data$macd <- macd$macd
-indicator_data$macd_signal <- macd$signal
+indicator_data$macd <- macd[, 1]
+indicator_data$macd_signal <- macd[, 2]
 
 # Horní a dolní pásmo kolem klouzavého průměru. Určuje volatilitu. Vypočítává se jako SMA ± 2× směrodatná odchylka. Cena dotýkající se horního pásma = potenciální překoupení. Dotýkající se spodního = přeprodanost.
 bb <- BBands(indicator_data$close, n = 20)
-indicator_data$bb_up <- bb$up
-indicator_data$bb_dn <- bb$dn
+indicator_data$bb_up <- bb[, 3]
+indicator_data$bb_dn <- bb[, 1]
 
 # Kumulativní součet objemu obchodování s ohledem na směr ceny. Pokud roste OBV spolu s cenou, potvrzuje trend. Divergence (např. cena roste, OBV klesá) varuje před obratem.
 indicator_data$obv <- OBV(rawdata$close, rawdata$volume)
 
 # Aplikuje stochastický oscilátor na RSI, takže výsledná hodnota je mezi 0 a 1.
-indicator_data$stochrsi <- stochRSI(rawdata$close, n = 14, maType = "SMA")
+stochrsi <- (indicator_data$rsi - runMin(indicator_data$rsi, n = 14)) / (runMax(indicator_data$rsi, n = 14) - runMin(indicator_data$rsi, n = 14))
+
+# Ulož si výsledek
+indicator_data$stochrsi <- stochrsi
 
 # Sila trendu bez smeru
 adx <- ADX(cbind(rawdata$high, rawdata$low, rawdata$close), n = 14)
@@ -68,6 +71,9 @@ indicator_data$adx <- adx[, 4]
 
 
 save(indicator_data, file = "data/cleandata/tsla_quant_indicators.RData")
+
+
+
 
 
 # TRENDS + TWEETS DATA ==================
@@ -174,4 +180,32 @@ tweets_tsla_daily <- tweets_tsla |>
 
 write_csv(tweets_tsla_daily, "data/rawdata/tweets_tsla_daily.csv")
 
-# TODO: Znovu nacist po finBERT upravit do struktury R a ulozit save(RData) do /cleandata
+# NOTE: Znovu nacist po finBERT a ulozit do cleandata
+sentiment_daily <- read_csv("data/rawdata/tweets_tsla_daily_sentiment.csv")
+sentiment_not_agr <- read_csv("data/rawdata/tweets_tsla_not_agregated_sentiment.csv")
+
+save(sentiment_daily, file = "data/cleandata/tweets_tsla_daily_sentiment.RData")
+save(sentiment_not_agr, file = "data/cleandata/tweets_tsla_not_agregated_sentiment.RData")
+
+
+
+
+# AAII sentiment survey ================
+sent_surv <- read_excel("data/rawdata/sentiment_survey.xls", skip = 2)
+sent_surv_clean <- sent_surv |>
+    mutate(
+        date = format(`Reported Date`, "%Y-%m-%d"),
+    ) |>
+    select(-`Reported Date`) |>
+    na.omit()
+
+save(sent_surv_clean, file = "data/cleandata/sentiment_survey.RData")
+
+
+
+# VIX ================
+vix_data <- tq_get("^VIX", from = "2010-06-01", to = "2025-05-01")
+vix_data_clean <- vix_data |>
+    select(-c(symbol, volume))
+
+save(vix_data_clean, file = "data/cleandata/vix.RData")
