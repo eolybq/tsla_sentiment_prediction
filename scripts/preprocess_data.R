@@ -1,10 +1,10 @@
+rm(list = ls())
+
 library(tidyverse)
 library(readxl)
 library(tidyquant)
 library(TTR)
 library(trendecon)
-
-rm(list = ls())
 
 
 # STOCK DATA + INDICATORS ===============
@@ -194,7 +194,7 @@ save(sentiment_not_agr, file = "data/cleandata/tweets_tsla_not_agregated_sentime
 sent_surv <- read_excel("data/rawdata/sentiment_survey.xls", skip = 2)
 sent_surv_clean <- sent_surv |>
     mutate(
-        date = format(`Reported Date`, "%Y-%m-%d"),
+        date = as.Date(format(`Reported Date`, "%Y-%m-%d")),
     ) |>
     select(-`Reported Date`) |>
     na.omit()
@@ -224,6 +224,22 @@ walk(clean_data_list, ~load(.x, envir = .GlobalEnv))
 walk(ls(), ~print(get(.)))
 
 
+
+# NOTE: MONTHLY trends převedeno na DAILY způsobem last obs.
+tesla_trends_daily <- tesla_trends |>
+    mutate(date = as.Date(paste0(date, "-01"))) |>
+    complete(date = seq.Date(min(date), max(date) + months(1) - days(1), by = "day")) |>
+    fill(value, .direction = "down") |>
+    ungroup()
+
+# NOTE: WEEKLY surv_sentiment převedeno na DAILY způsobem last obs.
+sent_surv_daily <- sent_surv_clean |>
+    mutate(date = as.Date(date)) |>
+    complete(date = seq.Date(min(date), max(date), by = "day")) |>
+    fill(Bullish, Neutral, Bearish, `Bull-Bear Spread`, .direction = "down")
+
+
+
 tibble_data <- indicator_data |>
     left_join(
         vix_data_clean |>
@@ -233,12 +249,29 @@ tibble_data <- indicator_data |>
     left_join(
         sentiment_daily |>
             mutate(
-                tweets_sentiment = replace_na(sentiment, "none"),
-                tweets_sentiment = factor(tweets_sentiment, levels = c("none", "neutral", "positive", "negative"))
+                tweets_sentiment = factor(
+                    sentiment, levels = c(
+                        "none",
+                        "neutral",
+                        "positive",
+                        "negative"
+                    )
+                )
             ) |>
             select(date, tweets_sentiment),
         by = "date"
     ) |>
-    # left_join(daily_tesla_trends_data, by = "date") |>
-    # left_join(tesla_trends, by = "date") |>
-    # left_join(sent_surv_clean, by = "date") |>
+    mutate(
+        tweets_sentiment = replace_na(tweets_sentiment, "none"),
+    ) |>
+    left_join(
+        tesla_trends_daily,
+        by = "date"
+    ) |>
+    left_join(
+        sent_surv_daily |>
+            select(date, Bullish, Neutral, Bearish, `Bull-Bear Spread`),
+        by = "date"
+    )
+
+save(tibble_data, file = "data/cleandata/tibble_data.RData")
