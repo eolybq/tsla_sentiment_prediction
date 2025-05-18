@@ -10,9 +10,6 @@ library(trendecon)
 # STOCK DATA + INDICATORS ===============
 # Stažení historických dat pro TSLA
 rawdata <- tq_get("TSLA", from = "2010-06-01", to = "2025-05-01")
-rawdata <- rawdata |>
-    select(-symbol)
-
 
 
 # ============================
@@ -70,7 +67,7 @@ adx <- ADX(cbind(rawdata$high, rawdata$low, rawdata$close), n = 14)
 indicator_data$adx <- adx[, 4]
 
 
-save(indicator_data, file = "data/cleandata/tsla_quant_indicators.RData")
+save(indicator_data, file = "data/cleandata/individual_data/tsla_quant_indicators.RData")
 
 
 
@@ -79,18 +76,19 @@ save(indicator_data, file = "data/cleandata/tsla_quant_indicators.RData")
 # TRENDS + TWEETS DATA ==================
 
 # NOTE: DAILY normalizovane hodnoty z baliku trendecon z Google trends api
-daily_tesla_trends_data <- ts_gtrends_mwd("tesla", geo = "US", from = "2010-06-01")
-
-save(daily_tesla_trends_data, file = "data/cleandata/daily_tesla_trends.RData")
+# Problem stahnout pres den - ! proto komentar - ale stazeno odsud
+# daily_tesla_trends_data <- ts_gtrends_mwd("tesla", geo = "US", from = "2010-06-01")
+#
+# save(daily_tesla_trends_data, file = "data/cleandata/individual_data/daily_tesla_trends.RData")
 
 # NOTE: stazene primo z Google trends !!!! MONTHLY
 tesla_trends <- read_csv(
     "data/rawdata/tesla_trends.csv",
     skip = 3,
-    col_names = c("date", "value")
+    col_names = c("date", "g_trends")
 )
 
-save(tesla_trends, file = "data/cleandata/tesla_trends.RData")
+save(tesla_trends, file = "data/cleandata/individual_data/tesla_trends.RData")
 
 # NOTE: Korelace s tesla_trends = 0.9042762 takže asi whatever co použiju
 #tsla_trends <- read_csv("data/rawdata/tsla_trends.csv", skip = 1)
@@ -184,8 +182,8 @@ write_csv(tweets_tsla_daily, "data/rawdata/tweets_tsla_daily.csv")
 sentiment_daily <- read_csv("data/rawdata/tweets_tsla_daily_sentiment.csv")
 sentiment_not_agr <- read_csv("data/rawdata/tweets_tsla_not_agregated_sentiment.csv")
 
-save(sentiment_daily, file = "data/cleandata/tweets_tsla_daily_sentiment.RData")
-save(sentiment_not_agr, file = "data/cleandata/tweets_tsla_not_agregated_sentiment.RData")
+save(sentiment_daily, file = "data/cleandata/individual_data/tweets_tsla_daily_sentiment.RData")
+save(sentiment_not_agr, file = "data/cleandata/individual_data/tweets_tsla_not_agregated_sentiment.RData")
 
 
 
@@ -197,18 +195,22 @@ sent_surv_clean <- sent_surv |>
         date = as.Date(format(`Reported Date`, "%Y-%m-%d")),
     ) |>
     select(-`Reported Date`) |>
-    na.omit()
+    na.omit() |>
+    rename(
+        bullish_surv = `Bullish`,
+        neutral_surv = `Neutral`,
+        bearish_surv = `Bearish`,
+        bull_bear_spread_surv = `Bull-Bear Spread`
+    )
 
-save(sent_surv_clean, file = "data/cleandata/sentiment_survey.RData")
+save(sent_surv_clean, file = "data/cleandata/individual_data/sentiment_survey.RData")
 
 
 
 # VIX ================
 vix_data <- tq_get("^VIX", from = "2010-06-01", to = "2025-05-01")
-vix_data_clean <- vix_data |>
-    select(-c(symbol, volume))
 
-save(vix_data_clean, file = "data/cleandata/vix.RData")
+save(vix_data, file = "data/cleandata/individual_data/vix.RData")
 
 
 
@@ -217,7 +219,9 @@ save(vix_data_clean, file = "data/cleandata/vix.RData")
 
 
 # SPOJENI DAT DO JEDNOHO TIBBLE ================
-clean_data_list <- dir("data/cleandata", full.names = TRUE)
+rm(list = ls())
+
+clean_data_list <- dir("data/cleandata/individual_data", full.names = TRUE)
 walk(clean_data_list, ~load(.x, envir = .GlobalEnv))
 
 # Print všech data jednotlivě
@@ -229,20 +233,20 @@ walk(ls(), ~print(get(.)))
 tesla_trends_daily <- tesla_trends |>
     mutate(date = as.Date(paste0(date, "-01"))) |>
     complete(date = seq.Date(min(date), max(date) + months(1) - days(1), by = "day")) |>
-    fill(value, .direction = "down") |>
+    fill(g_trends, .direction = "down") |>
     ungroup()
 
 # NOTE: WEEKLY surv_sentiment převedeno na DAILY způsobem last obs.
 sent_surv_daily <- sent_surv_clean |>
     mutate(date = as.Date(date)) |>
     complete(date = seq.Date(min(date), max(date), by = "day")) |>
-    fill(Bullish, Neutral, Bearish, `Bull-Bear Spread`, .direction = "down")
+    fill(bullish_surv, neutral_surv, bearish_surv, bull_bear_spread_surv, .direction = "down")
 
 
 
-tibble_data <- indicator_data |>
+tibble_data_all <- indicator_data |>
     left_join(
-        vix_data_clean |>
+        vix_data |>
             select(date, vix_close = close),
         by = "date"
     ) |>
@@ -270,8 +274,22 @@ tibble_data <- indicator_data |>
     ) |>
     left_join(
         sent_surv_daily |>
-            select(date, Bullish, Neutral, Bearish, `Bull-Bear Spread`),
+            select(date, bullish_surv, neutral_surv, bearish_surv, bull_bear_spread_surv),
         by = "date"
     )
+
+
+# NOTE: Omezení vzorku dle sentiment_daily
+# TODO: POKUD TWEETS SENTIMENT DATA K NIČEMU TAK ZRUŠIT
+tibble_data_all_adj <- tibble_data_all |>
+    filter(
+        date >= min(sentiment_daily$date) &
+            date <= max(sentiment_daily$date)
+    )
+
+# Odstranění sloupců, které nejsou potřeba
+tibble_data <- tibble_data_all_adj |>
+    select(-symbol, -adjusted, -open, -high, -low)
+
 
 save(tibble_data, file = "data/cleandata/tibble_data.RData")
