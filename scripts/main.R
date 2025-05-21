@@ -1,11 +1,14 @@
 rm(list = ls())
 
+library(conflicted)
+conflict_prefer("select", "dplyr")
 library(tidyverse)
 library(tseries)
 library(corrr)
 library(factoextra)
 library(car)
 library(forecast)
+library(vars)
 
 load("data/cleandata/tibble_data.RData")
 
@@ -265,7 +268,16 @@ trans_tdata <- tibble_data_all |>
     mutate(
         # close = log(close)
         close = c(NA, diff(log(close))),
-        # NOTE: zpozdeni sentiment, tweets, trend vars
+
+        # NOTE: Zpozdeni tweets, trend, sentiment vars
+        tweets_sentiment = c(
+            factor(NA, levels = levels(tweets_sentiment)),
+            tweets_sentiment[-length(tweets_sentiment)]
+        ),
+        g_trends = c(NA, g_trends[-length(g_trends)]),
+        neutral_surv = c(NA, neutral_surv[-length(neutral_surv)]),
+        bull_bear_spread_surv = c(NA, bull_bear_spread_surv[-length(bull_bear_spread_surv)]),
+
     ) |>
     drop_na()
 
@@ -298,6 +310,45 @@ lm(close ~ ., data = select(trans_tdata, -date)) |>
 
 # ESTIMATIONS ================
 
+# NOTE: Matice pro exogenní proměnné pro odhady
+# TODO: mozna oddelat vix_close
+xreg_mat <- model.matrix(~ tweets_sentiment + vix_close + g_trends + bull_bear_spread_surv + neutral_surv, data = trans_tdata)
+xreg_mat <- xreg_mat[, colnames(xreg_mat) != "(Intercept)"]
+
+
+# ARIMA
+# NOTE: ARIMA(2, 0, 2) optimální na celém vzorku
+trans_tdata |>
+    select(close) |>
+    auto.arima()
+
+
+# ARIMAX
+# NOTE: ARIMA(2, 0, 2) optimální na celém vzorku
+trans_tdata |>
+    select(close) |>
+    auto.arima(
+        xreg = xreg_mat
+    )
+
+
+# VAR
+# NOTE: VAR(20 / 16 / 4 / 20) optimální na celém vzorku
+trans_tdata |>
+    select(
+        -date,
+        -tweets_sentiment,
+        -g_trends,
+        -bull_bear_spread_surv,
+        -neutral_surv,
+        # TODO: mozna oddelat vix_close
+        -vix_close
+    ) |>
+    VARselect(
+        lag.max = 20,
+        type = "const",
+        exogen = xreg_mat
+    )
 
 
 
@@ -327,3 +378,10 @@ print(pp_results_h)
 
 
 # PREDICTIONS ================
+
+# TODO: nejak zajistit kam vlastne to budu vubec ukladat ty pred - potrebuju i actuals
+predictions <- tibble(
+    date = 
+)
+
+# NAIVE
