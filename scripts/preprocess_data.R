@@ -4,7 +4,7 @@ library(tidyverse)
 library(readxl)
 library(tidyquant)
 library(TTR)
-library(trendecon)
+# library(trendecon)
 
 
 # STOCK DATA + INDICATORS ===============
@@ -289,7 +289,8 @@ tibble_data_all_adj <- tibble_data_all |>
 
 # Odstranění sloupců, které nejsou potřeba
 tibble_data <- tibble_data_all_adj |>
-    select(-symbol, -adjusted, -open, -high, -low)
+    select(-symbol, -adjusted, -open, -high, -low) |>
+    drop_na()
 
 
 save(tibble_data, file = "data/cleandata/tibble_data.RData")
