@@ -67,7 +67,7 @@ adx <- ADX(cbind(rawdata$high, rawdata$low, rawdata$close), n = 14)
 indicator_data$adx <- adx[, 4]
 
 
-save(indicator_data, file = "data/cleandata/individual_data/tsla_quant_indicators.RData")
+save(indicator_data, file = "cleandata/individual_data/tsla_quant_indicators.RData")
 
 
 
@@ -79,26 +79,26 @@ save(indicator_data, file = "data/cleandata/individual_data/tsla_quant_indicator
 # Problem stahnout pres den - ! proto komentar - ale stazeno odsud
 # daily_tesla_trends_data <- ts_gtrends_mwd("tesla", geo = "US", from = "2010-06-01")
 #
-# save(daily_tesla_trends_data, file = "data/cleandata/individual_data/daily_tesla_trends.RData")
+# save(daily_tesla_trends_data, file = "cleandata/individual_data/daily_tesla_trends.RData")
 
 # NOTE: stazene primo z Google trends !!!! MONTHLY
 tesla_trends <- read_csv(
-    "data/rawdata/tesla_trends.csv",
+    "../data/rawdata/tesla_trends.csv",
     skip = 3,
     col_names = c("date", "g_trends")
 )
 
-save(tesla_trends, file = "data/cleandata/individual_data/tesla_trends.RData")
+save(tesla_trends, file = "cleandata/individual_data/tesla_trends.RData")
 
 # NOTE: Korelace s tesla_trends = 0.9042762 takže asi whatever co použiju
-#tsla_trends <- read_csv("data/rawdata/tsla_trends.csv", skip = 1)
+#tsla_trends <- read_csv("../data/rawdata/tsla_trends.csv", skip = 1)
 #tsla_trends[[2]] <- as.numeric(str_replace_all(tsla_trends[[2]], "\\D", ""))
 
 
 
-elon_tweets <- read_csv("data/rawdata/elon_2010_2025/all_musk_posts.csv")
+elon_tweets <- read_csv("../data/rawdata/elon_2010_2025/all_musk_posts.csv")
 # RETWEETS DATA
-# elon_retweets <- read_csv("data/rawdata/elon_2010_2025/musk_quote_tweets.csv")
+# elon_retweets <- read_csv("../data/rawdata/elon_2010_2025/musk_quote_tweets.csv")
 
 
 # Tweets cleanup od hastags mention emojis answers atd.
@@ -166,7 +166,7 @@ tweets_tsla <- elon_tweets |>
     )) |>
     arrange(date)
 
-write_csv(tweets_tsla, "data/rawdata/tweets_tsla_not_agregated.csv")
+write_csv(tweets_tsla, "../data/rawdata/tweets_tsla_not_agregated.csv")
 
 # agregace vsech tweetu na denní frekvenci
 tweets_tsla_daily <- tweets_tsla |>
@@ -176,20 +176,20 @@ tweets_tsla_daily <- tweets_tsla |>
         .groups = "drop"
     )
 
-write_csv(tweets_tsla_daily, "data/rawdata/tweets_tsla_daily.csv")
+write_csv(tweets_tsla_daily, "../data/rawdata/tweets_tsla_daily.csv")
 
 # NOTE: Znovu nacist po finBERT a ulozit do cleandata
-sentiment_daily <- read_csv("data/rawdata/tweets_tsla_daily_sentiment.csv")
-sentiment_not_agr <- read_csv("data/rawdata/tweets_tsla_not_agregated_sentiment.csv")
+sentiment_daily <- read_csv("../data/rawdata/tweets_tsla_daily_sentiment.csv")
+sentiment_not_agr <- read_csv("../data/rawdata/tweets_tsla_not_agregated_sentiment.csv")
 
-save(sentiment_daily, file = "data/cleandata/individual_data/tweets_tsla_daily_sentiment.RData")
-save(sentiment_not_agr, file = "data/cleandata/individual_data/tweets_tsla_not_agregated_sentiment.RData")
+save(sentiment_daily, file = "cleandata/individual_data/tweets_tsla_daily_sentiment.RData")
+save(sentiment_not_agr, file = "cleandata/individual_data/tweets_tsla_not_agregated_sentiment.RData")
 
 
 
 
 # AAII sentiment survey ================
-sent_surv <- read_excel("data/rawdata/sentiment_survey.xls", skip = 2)
+sent_surv <- read_excel("../data/rawdata/sentiment_survey.xls", skip = 2)
 sent_surv_clean <- sent_surv |>
     mutate(
         date = as.Date(format(`Reported Date`, "%Y-%m-%d")),
@@ -203,14 +203,14 @@ sent_surv_clean <- sent_surv |>
         bull_bear_spread_surv = `Bull-Bear Spread`
     )
 
-save(sent_surv_clean, file = "data/cleandata/individual_data/sentiment_survey.RData")
+save(sent_surv_clean, file = "cleandata/individual_data/sentiment_survey.RData")
 
 
 
 # VIX ================
 vix_data <- tq_get("^VIX", from = "2010-06-01", to = "2025-05-01")
 
-save(vix_data, file = "data/cleandata/individual_data/vix.RData")
+save(vix_data, file = "cleandata/individual_data/vix.RData")
 
 
 
@@ -221,7 +221,7 @@ save(vix_data, file = "data/cleandata/individual_data/vix.RData")
 # SPOJENI DAT DO JEDNOHO TIBBLE ================
 rm(list = ls())
 
-clean_data_list <- dir("data/cleandata/individual_data", full.names = TRUE)
+clean_data_list <- dir("cleandata/individual_data", full.names = TRUE)
 walk(clean_data_list, ~load(.x, envir = .GlobalEnv))
 
 # Print všech data jednotlivě
@@ -293,4 +293,4 @@ tibble_data <- tibble_data_all_adj |>
     drop_na()
 
 
-save(tibble_data, file = "data/cleandata/tibble_data.RData")
+save(tibble_data, file = "cleandata/tibble_data.RData")
