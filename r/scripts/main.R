@@ -14,7 +14,7 @@ library(vars)
 library(writexl)
 library(gridExtra)
 
-load("data/cleandata/tibble_data.RData")
+load("cleandata/tibble_data.RData")
 
 
 # NOTE: Stacionarita a tabulka p hodnot testu
