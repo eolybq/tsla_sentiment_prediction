@@ -1,8 +1,5 @@
 import pandas as pd
 from pandas.tseries.offsets import MonthEnd
-import matplotlib.pyplot as plt
-from pytrends.request import TrendReq
-from datetime import datetime, timedelta
 
 indicator_data = pd.read_csv('cleandata/indicator_data.csv')
 tesla_trends = pd.read_csv('cleandata/tesla_trends.csv')
@@ -12,44 +9,29 @@ sentiment_daily = pd.read_csv('cleandata/sentiment_daily.csv')
 sentiment_not_agr = pd.read_csv('cleandata/sentiment_not_agr.csv')
 vix = pd.read_csv('cleandata/vix_data.csv')
 
+# TODO: prevest tesla trends na MONTHLY - asi last obs. nebo ten trendecon?
 
-# Ocisteni pouze sledovanych sloupcu
-indicator_data = indicator_data.drop(['symbol', 'open', 'high', 'low', 'close'], axis = 1)
-sent_surv_clean = sent_surv_clean.loc[:, ['date', 'bullish_surv', 'neutral_surv', 'bearish_surv', 'bull_bear_spread_surv']]
-vix = vix.loc[:, ['date', 'adjusted']]
-
-
-# Prevod trends na DAILY frekvenci
 # 1. Vytvoř date jako první den měsíce (předpoklad: 'date' je string ve formátu "YYYY-MM")
 tesla_trends['date'] = pd.to_datetime(tesla_trends['date'] + '-01')
 
 # 2. Vytvoř kompletní rozsah dat (denní frekvence)
-date_range_trends = pd.date_range(
+date_range = pd.date_range(
     start=tesla_trends['date'].min(),
     end=tesla_trends['date'].max() + MonthEnd(1) - pd.Timedelta(days=1),
     freq='D'
 )
 
 # 3. Zajisti, že pro každý den bude řádek – merge s plným kalendářem
-full_trends_df = pd.DataFrame({'date': date_range_trends})
-tesla_trends_daily = pd.merge(full_trends_df, tesla_trends, on='date', how='left')
+full_df = pd.DataFrame({'date': date_range})
+tesla_trends_daily = pd.merge(full_df, tesla_trends, on='date', how='left')
 
 # 4. Vyplň chybějící g_trends směrem dolů (downward fill)
 tesla_trends_daily['g_trends'] = tesla_trends_daily['g_trends'].ffill()
 
 
-sent_surv_clean['date'] = pd.to_datetime(sent_surv_clean['date'])
 
-date_range_surv = pd.date_range(
-    start=sent_surv_clean['date'].min(),
-    end=sent_surv_clean['date'].max() + MonthEnd(1) - pd.Timedelta(days=1),
-    freq='D'
-    )
 
-full_surv_df = pd.DataFrame({'date': date_range_surv})
-surv_daily = pd.merge(full_surv_df, sent_surv_clean, on='date', how='left')
-
-surv_daily = surv_daily.ffill()
+# TODO: WEEKLY surv_sentiment převedeno na DAILY způsobem last obs.
 
 # TODO: vymyslet co s NA v tweets sentiment a taky jak z toho udelat oprp faktor nebo tak neco??? ty NA co vziknou pri merge s ostatnimi vlastne nejak asi predelat na tu uroven
 
