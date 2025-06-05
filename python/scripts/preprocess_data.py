@@ -4,19 +4,21 @@ import matplotlib.pyplot as plt
 from pytrends.request import TrendReq
 from datetime import datetime, timedelta
 
-indicator_data = pd.read_csv('cleandata/indicator_data.csv')
-tesla_trends = pd.read_csv('cleandata/tesla_trends.csv')
-daily_tesla_trends = pd.read_csv('cleandata/daily_tesla_trends_data.csv')
-sent_surv_clean = pd.read_csv('cleandata/sent_surv_clean.csv')
-sentiment_daily = pd.read_csv('cleandata/sentiment_daily.csv')
-sentiment_not_agr = pd.read_csv('cleandata/sentiment_not_agr.csv')
-vix = pd.read_csv('cleandata/vix_data.csv')
+indicator_data = pd.read_csv('cleandata/individual_data/indicator_data.csv')
+tesla_trends = pd.read_csv('cleandata/individual_data/tesla_trends.csv')
+daily_tesla_trends = pd.read_csv('cleandata/individual_data/daily_tesla_trends_data.csv')
+sent_surv_clean = pd.read_csv('cleandata/individual_data/sent_surv_clean.csv')
+sentiment_daily = pd.read_csv('cleandata/individual_data/sentiment_daily.csv')
+sentiment_not_agr = pd.read_csv('cleandata/individual_data/sentiment_not_agr.csv')
+vix = pd.read_csv('cleandata/individual_data/vix_data.csv')
 
 
 # Ocisteni pouze sledovanych sloupcu
 indicator_data = indicator_data.drop(['symbol', 'open', 'high', 'low', 'close'], axis = 1)
 sent_surv_clean = sent_surv_clean.loc[:, ['date', 'bullish_surv', 'neutral_surv', 'bearish_surv', 'bull_bear_spread_surv']]
 vix = vix.loc[:, ['date', 'adjusted']]
+vix = vix.rename(columns={'adjusted': 'vix'})
+tweets_sentiment = sentiment_daily.loc[:, ['sentiment', 'date']]
 
 
 # Prevod trends na DAILY frekvenci
@@ -51,17 +53,28 @@ surv_daily = pd.merge(full_surv_df, sent_surv_clean, on='date', how='left')
 
 surv_daily = surv_daily.ffill()
 
-# TODO: vymyslet co s NA v tweets sentiment a taky jak z toho udelat oprp faktor nebo tak neco??? ty NA co vziknou pri merge s ostatnimi vlastne nejak asi predelat na tu uroven
 
+# Merge všech dat do jednoho DataFrame
 
+# všude je date typu datetime
+vix['date'] = pd.to_datetime(vix['date'])
+tweets_sentiment['date'] = pd.to_datetime(tweets_sentiment['date'])
+tesla_trends_daily['date'] = pd.to_datetime(tesla_trends_daily['date'])
+surv_daily['date'] = pd.to_datetime(surv_daily['date'])
+
+data = pd.merge(vix, tweets_sentiment, on='date', how='left')
+data = pd.merge(data, tesla_trends_daily, on='date', how='left')
+data = pd.merge(data, surv_daily, on='date', how='left')
+
+data['sentiment'] = data['sentiment'].fillna('none')
 
 # NOTE: Omezení vzorku dle sentiment_daily
 # TODO: POKUD TWEETS SENTIMENT DATA K NIČEMU TAK ZRUŠIT
+data = data[
+    (data['date'] >= sentiment_daily['date'].min()) &
+    (data['date'] <= sentiment_daily['date'].max())
+]
 
+data = data.dropna()
 
-
-# Odstranění sloupců, které nejsou potřeba
-# tibble_data <- tibble_data_all_adj |>
-#     select(-symbol, -adjusted, -open, -high, -low) |>
-#     drop_na()
-
+data.to_csv('cleandata/processed_data.csv', index=False)
