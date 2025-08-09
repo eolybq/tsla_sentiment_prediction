@@ -57,6 +57,7 @@ surv_daily = surv_daily.ffill()
 # Merge všech dat do jednoho DataFrame
 
 # všude je date typu datetime
+indicator_data['date'] = pd.to_datetime(indicator_data['date'])
 vix['date'] = pd.to_datetime(vix['date'])
 tweets_sentiment['date'] = pd.to_datetime(tweets_sentiment['date'])
 tesla_trends_daily['date'] = pd.to_datetime(tesla_trends_daily['date'])
@@ -65,6 +66,7 @@ surv_daily['date'] = pd.to_datetime(surv_daily['date'])
 data = pd.merge(vix, tweets_sentiment, on='date', how='left')
 data = pd.merge(data, tesla_trends_daily, on='date', how='left')
 data = pd.merge(data, surv_daily, on='date', how='left')
+data = pd.merge(data, indicator_data, on='date', how='left')
 
 data['sentiment'] = data['sentiment'].fillna('none')
 
