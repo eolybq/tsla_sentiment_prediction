@@ -69,6 +69,9 @@ data = pd.merge(data, surv_daily, on='date', how='left')
 data = pd.merge(data, indicator_data, on='date', how='left')
 
 data['sentiment'] = data['sentiment'].fillna('none')
+data = pd.concat([data, pd.get_dummies(data['sentiment'], prefix='sentiment').astype(float)], axis=1)
+data = data.drop(columns=['sentiment'])
+
 
 # NOTE: Omezení vzorku dle sentiment_daily
 # TODO: POKUD TWEETS SENTIMENT DATA K NIČEMU TAK ZRUŠIT
