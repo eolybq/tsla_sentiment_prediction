@@ -119,7 +119,7 @@ plt.show()
 
 
 ### LOGIT
-y = (y > 0.05).astype(int)
+y = (y > 0.005).astype(int)
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, shuffle = False)
@@ -132,8 +132,8 @@ def sigmoid(z):
 
 weight = np.zeros(X_train.shape[1])
 bias = 0
-rate = 0.01
-epochs = 10000
+rate = 0.008
+epochs = 100000
 loss_history = []
 
 for epoch in range(epochs):
@@ -156,7 +156,9 @@ for epoch in range(epochs):
 
 # Predikce na testu
 y_pred_test = sigmoid(np.dot(X_test, weight) + bias)
-y_pred_class = (y_pred_test > 0.5).astype(int)
+y_pred_class = (y_pred_test > 0.35).astype(int)
+
+print(f"Trefeno 1: {np.sum((y_pred_class == y_test) & (y_pred_class == 1))} Trefeno 0: {np.sum((y_pred_class == y_test) & (y_pred_class == 0))}, Celkem: {len(y_pred_class)}")
 
 from sklearn.metrics import accuracy_score
 print("Test accuracy:", accuracy_score(y_test, y_pred_class))
