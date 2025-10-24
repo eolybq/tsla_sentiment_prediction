@@ -55,7 +55,7 @@ plt.tight_layout()
 plt.show()
 
 
-
+# TODO: Standartizovat jen podle train dat -> data leakage
 for column in X:
     if "sentiment" not in column:
         X[column] = (X[column] - X[column].mean()) / X[column].std()
