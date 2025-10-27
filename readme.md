@@ -60,6 +60,7 @@ The project aims to provide a comprehensive evaluation of both predictive power 
 | Naive  | 0.0029    | 0.0540    | 0.0391    | 1.0000   |
 
 - Basic univariate ARIMA model without unique data used in this project beats ARIMAX with this data aswell as multivariate models.
+- Every model beats Naive model
 
 **Predictions in plot:**
 ![Predictions plot](plots_tabs/preds.png)
