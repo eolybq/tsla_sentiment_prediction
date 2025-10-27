@@ -34,7 +34,8 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 
 
 ## Tools used
-- Python (Pandas, Numpy, Matplotlib), R (Tidyverse, Tidyquant)
+- Python (Pandas, Numpy, Statsmodels, Matplotlib, Transformers - HuggingFace)
+- R (Tidyverse, Tidyquant)
 - HuggingFace - model FinBERT
 
 - Time series modeling: ARIMA, VAR, ARIMAX, VARX, Gradient descent linear regression, Gradient descent LOGIT.  
