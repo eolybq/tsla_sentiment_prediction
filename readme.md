@@ -1,12 +1,26 @@
 # Stock Price Prediction Project
 
-- ! THIS PROJECT IS CURRENTLY IN-PROGRESS - SOME FEATURES AREN'T IMPLEMENTED YET.
+- ! PART 2 OF THIS PROJECT IS CURRENTLY IN-PROGRESS - SOME FEATURES AREN'T IMPLEMENTED YET.
 
 This project explores and evaluates different approaches for predicting stock prices using financial time series data. Its main goal is to identify the most effective models and assess their practical performance in trading scenarios.
 This project also introduce unusual data - sentiment indicator derived from Elon Musk's tweets from 2010 to 2025 which contains keywords related to "Tesla" company. Elon's tweets can be influential to markets, so sentiment indicated by each tweet related to Telsa might incorporate relevant data to my models. FinBERT model is used to make NLP analysis to get sentiment indicators.
 
 
 ## Project Overview
+
+### Part 1
+**Unconventional data, conventional models**
+- Main programming language: R (python used to get model form HuggingFace)
+
+- Project evaluates time-series models (ARIMA, ARIMAX, VAR, VARX) on unique data to get answer on hypothesis, that unique Elon Musk's tweets sentiment indicator data, volatility data and market sentiment data bring a lot of information to model predicting financial stock data. 
+- Projects uses different model architectures to asses different approaches and compare their evaluation metrics -> their performance.
+
+### Part 2
+**Unconventional data, uncoventional models**
+- Main programming language: Python
+
+- Project aims to extend Part 1 of this project. Extension lies in using python instead of R to make machine-learning models and their prediction evaluations. Then compare traditional time-series models and these models to get result of perfomance on financial data.
+
 
 1. **Model Comparison:**  
    - Analyze a large dataset to identify the best-performing models (ARIMA, VAR, ML regression-based models, etc.).  
