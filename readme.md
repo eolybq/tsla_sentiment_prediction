@@ -43,3 +43,23 @@ This project also introduce unusual data - sentiment indicator derived from Elon
 - Performance evaluation including prediction error and trading profit/loss with backtest (currently in-progress).  
 
 The project aims to provide a comprehensive evaluation of both predictive power and practical applicability for stock price forecasting.
+
+
+## Outcomes
+
+### PART 1 OF THE PROJECT
+
+**Predictions evaluation across models:**
+
+| Model  | MSE       | RMSE      | MAE       | MASE     |
+|--------|-----------|-----------|-----------|----------|
+| ARIMA  | **0.0014** | **0.0381** | **0.0267** | **0.6823** |
+| ARIMAX | 0.0015    | 0.0383    | 0.0268    | 0.6858   |
+| VAR    | 0.0015    | 0.0383    | 0.0271    | 0.6925   |
+| VARX   | 0.0015    | 0.0384    | 0.0272    | 0.6962   |
+| Naive  | 0.0029    | 0.0540    | 0.0391    | 1.0000   |
+
+- Basic univariate ARIMA model without unique data used in this project beats ARIMAX with this data aswell as multivariate models.
+
+**Predictions in plot:**
+![Predictions plot](plots_tabs/preds.png)
