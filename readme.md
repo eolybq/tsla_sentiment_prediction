@@ -20,14 +20,14 @@ This project also introduce unusual data - sentiment indicator derived from Elon
    - Consider potential interactions such as volume and price, which may still influence each other.
 
 
-### Part 1
+### Part 1 (directory r/)
 **Unconventional data, conventional models**
 - Main programming language: R (python used to get model from HuggingFace)
 
 - Project evaluates time-series models (ARIMA, ARIMAX, VAR, VARX) on unique data to get answer on hypothesis, that unique Elon Musk's tweets sentiment indicator data, volatility data and market sentiment data bring a lot of information to model predicting financial stock data. 
 - Projects uses different model architectures to asses different approaches and compare their evaluation metrics -> their performance.
 
-### Part 2
+### Part 2 (directory python/)
 **Unconventional data, uncoventional models**
 - Main programming language: Python
 
