@@ -1,4 +1,4 @@
-# Stock Price Prediction Project
+# Tesla Price Prediction Project
 
 - **Part 1 of this project has its own report available (in Czech) in this file: [Report in PDF](r/text_prace.pdf) or [Report in DOCX](r/text_prace.docx)**
 
@@ -39,10 +39,7 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 - HuggingFace - model FinBERT
 
 - Time series modeling: ARIMA, VAR, ARIMAX, VARX, Gradient descent linear regression, Gradient descent LOGIT.  
-- Feature engineering with financial indicators and exogenous data.  
-- Performance evaluation including prediction error and trading profit/loss with backtest (currently in-progress).  
-
-The project aims to provide a comprehensive evaluation of both predictive power and practical applicability for stock price forecasting.
+- Feature engineering with financial indicators, market and sentiment data.  
 
 
 ## Outcomes
