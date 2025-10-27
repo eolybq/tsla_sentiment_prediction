@@ -1,7 +1,6 @@
 import pandas as pd
 from pandas.tseries.offsets import MonthEnd
 import matplotlib.pyplot as plt
-from pytrends.request import TrendReq
 from datetime import datetime, timedelta
 
 indicator_data = pd.read_csv('cleandata/individual_data/indicator_data.csv')
