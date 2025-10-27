@@ -1,5 +1,7 @@
 # Stock Price Prediction Project
 
+- **Part 1 of this project has its own report written in this file: [Report in PDF](r/text_prace.pdf) or [Report in DOCX](r/text_prace.docx)**
+
 - ! PART 2 OF THIS PROJECT IS CURRENTLY IN-PROGRESS - SOME FEATURES AREN'T IMPLEMENTED YET.
 
 This project explores and evaluates different approaches for predicting stock prices using financial time series data. Its main goal is to identify the most effective models and assess their practical performance in trading scenarios.
