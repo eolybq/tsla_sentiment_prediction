@@ -32,11 +32,11 @@ date_range_trends = pd.date_range(
     freq='D'
 )
 
-# 3. Zajisti, že pro každý den bude řádek – merge s plným kalendářem
+# zajisti, že pro každý den bude řádek – merge s plným kalendářem
 full_trends_df = pd.DataFrame({'date': date_range_trends})
 tesla_trends_daily = pd.merge(full_trends_df, tesla_trends, on='date', how='left')
 
-# 4. Vyplň chybějící g_trends směrem dolů (downward fill)
+# vyplň chybějící g_trends směrem dolů (downward fill)
 tesla_trends_daily['g_trends'] = tesla_trends_daily['g_trends'].ffill()
 
 
