@@ -1,6 +1,6 @@
 # Stock Price Prediction Project
 
-- **Part 1 of this project has its own report written in this file: [Report in PDF](r/text_prace.pdf) or [Report in DOCX](r/text_prace.docx)**
+- **Part 1 of this project has its own report available (in Czech) in this file: [Report in PDF](r/text_prace.pdf) or [Report in DOCX](r/text_prace.docx)**
 
 - ! PART 2 OF THIS PROJECT IS CURRENTLY IN-PROGRESS - SOME FEATURES AREN'T IMPLEMENTED YET.
 
@@ -10,9 +10,19 @@ This project also introduce unusual data - sentiment indicator derived from Elon
 
 ## Project Overview
 
+1. **Model Comparison:**  
+   - Analyze a large dataset to identify the best-performing models (ARIMA, VAR, ML regression-based models, etc.).  
+   - Evaluate models on prediction accuracy
+
+2. **Prediction Approaches:**  
+   - Naive comparison of models (e.g., VAR vs AR)
+   - implementing ARIMA or VAR with exogenous variables for improved accuracy, as pure endogenous approach might be less suitable when exogenous indicators do not directly influence the target price.  
+   - Consider potential interactions such as volume and price, which may still influence each other.
+
+
 ### Part 1
 **Unconventional data, conventional models**
-- Main programming language: R (python used to get model form HuggingFace)
+- Main programming language: R (python used to get model from HuggingFace)
 
 - Project evaluates time-series models (ARIMA, ARIMAX, VAR, VARX) on unique data to get answer on hypothesis, that unique Elon Musk's tweets sentiment indicator data, volatility data and market sentiment data bring a lot of information to model predicting financial stock data. 
 - Projects uses different model architectures to asses different approaches and compare their evaluation metrics -> their performance.
@@ -24,17 +34,7 @@ This project also introduce unusual data - sentiment indicator derived from Elon
 - Project aims to extend Part 1 of this project. Extension lies in using python instead of R to make machine-learning models and their prediction evaluations. Then compare traditional time-series models and these models to get result of perfomance on financial data.
 
 
-1. **Model Comparison:**  
-   - Analyze a large dataset to identify the best-performing models (ARIMA, VAR, ML regression-based models, etc.).  
-   - Evaluate models on prediction accuracy
-
-2. **Prediction Approaches:**  
-   - Naive comparison of models (e.g., VAR vs AR)
-   - Focus on ARIMA or VAR with exogenous variables for improved accuracy, as pure endogenous approach might be less suitable when exogenous indicators do not directly influence the target price.  
-   - Consider potential interactions such as volume and price, which may still influence each other.
-
-
-## Tools & Techniques
+## Tools used
 - Python (Pandas, Numpy, Matplotlib), R (Tidyverse, Tidyquant)
 - HuggingFace - model FinBERT
 
