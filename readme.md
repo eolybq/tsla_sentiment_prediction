@@ -1,6 +1,6 @@
 # Tesla Price Prediction Project
 
-- **Part 1 of this project has its own report available (in Czech) in this file: [Report in PDF](r/text_prace.pdf) or [Report in DOCX](r/text_prace.docx)**
+- **Part 1 of this project has its own report available (in Czech) in this file: [Report in PDF](r/report.pdf) or [Report in DOCX](r/report.docx)**
 
 - ! PART 2 OF THIS PROJECT IS CURRENTLY IN-PROGRESS - SOME FEATURES AREN'T IMPLEMENTED YET.
 
