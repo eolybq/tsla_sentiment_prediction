@@ -12,11 +12,6 @@ df = pd.read_csv('cleandata/processed_data.csv')
 # Transformace
 # Zpozdeni
 
-# Začni jednoduchým modelem (např. Random Forest, XGBoost, lineární regrese).
-# Přidej zpožděné proměnné (lagy) – často výrazně zlepší predikci časových řad.
-# Vyzkoušej sekvenční modely (LSTM/RNN), pokud máš dost dat a zkušeností.
-# Vyhodnoť modely pomocí cross-validace a metrik jako RMSE, MAE.
-
 
 features = [
     'vix', 'sentiment_neutral', 'sentiment_positive', 'sentiment_negative', 'g_trends',
