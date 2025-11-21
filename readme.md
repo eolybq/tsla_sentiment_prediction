@@ -30,7 +30,7 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 **Unconventional data, uncoventional models**
 - Main programming language: Python
 
-- Project aims to extend Part 1 of this project. Extension lies in using python instead of R to make machine-learning models and their prediction evaluations. Then compare traditional time-series models and these models to get result of perfomance on financial data. At the moment there is Gradient Descent Linear Regression and Gradient Descend Logistic Regression done and LSTM planned.
+- Project aims to extend Part 1 of this project. Extension lies in using python instead of R to make machine-learning models and their prediction evaluations. Then compare traditional time-series models and these models to get result of perfomance on financial data. At the moment there is Gradient Descent Linear Regression and Gradient Descend Logistic Regression done (written from scratch) and LSTM planned.
 
 
 ## Tools used
@@ -39,7 +39,7 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 - HuggingFace - model FinBERT
 
 - Time series modeling: ARIMA, VAR, ARIMAX, VARX, Gradient descent linear regression, Gradient descent LOGIT.  
-- Feature engineering with financial indicators, market and sentiment data.  
+- Feature engineering with financial indicators, market and sentiment data. PCA is also used to reduce dimensionality. 
 
 
 ## Outcomes

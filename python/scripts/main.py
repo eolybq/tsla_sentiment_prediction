@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, accuracy_score, log_loss, roc_auc_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
-from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
-df = pd.read_csv('cleandata/processed_data.csv')
+df = pd.read_csv('../cleandata/processed_data.csv')
 
 # Stacionarita
 # PCA?
@@ -22,49 +22,33 @@ features = [
 
 
 
+X = pd.DataFrame()
 for col in features:
-    df[col + '_lag1'] = df[col].shift(1)
-    df[col + '_lag2'] = df[col].shift(2)
+    X[col + '_lag1'] = df[col].shift(1)
+    X[col + '_lag2'] = df[col].shift(2)
 
-df['adjusted'] = np.log(df['adjusted'] / df['adjusted'].shift(1))
-df = df.dropna().reset_index(drop=True)
+# log return
+y = np.log(df['adjusted'] / df['adjusted'].shift(1))
 
+X['log_return_lag1'] = y.shift(1)
 
-X = df[[f + '_lag1' for f in features] + [f + '_lag2' for f in features]].copy()
-X['adjusted_lag1'] = df['adjusted'].shift(1)
-X = X.dropna()
-
-y = df['adjusted']
-y = y.iloc[1:]
-
-
-
-fig, ax = plt.subplots(2, 1, figsize=(10,6))
-# ACF
-plot_acf(y, ax=ax[0], lags=40)
-ax[0].set_title(f"ACF pro adjusted")
-# PACF
-plot_pacf(y, ax=ax[1], lags=40)
-ax[1].set_title(f"PACF pro adjusted")
-plt.tight_layout()
-plt.show()
-
-
-# TODO: Standartizovat jen podle train dat -> data leakage
-for column in X:
-    if "sentiment" not in column:
-        X[column] = (X[column] - X[column].mean()) / X[column].std()
-
-
-
-
-
-X = np.array(X)
+# Drop 2 prvnich radku kvuli max lag = 2 a zarovnani indexu
+X = X.dropna().reset_index(drop=True)
+y = y.iloc[2:].reset_index(drop=True)
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, shuffle = False)
 
+# Standartizace jen podle train dat -> dle stejnych mean a sd pak standartizace test dat
+for column in X_train.columns:
+    if "sentiment" not in column:
+        mean = X_train[column].mean()
+        std = X_train[column].std()
+        X_train[column] = (X_train[column] - mean) / std
+        X_test[column] = (X_test[column] - mean) / std
 
+
+X_train, X_test = np.array(X_train), np.array(X_test)
 
 ### GRADIENT DESCENT LINEAR REGRESSION
 weight = np.zeros(X.shape[1])
@@ -97,6 +81,13 @@ plt.legend()
 plt.show()
 
 
+# R^2
+sse_train = np.sum((y_train.values - y_pred)**2)
+sst_train = np.sum((y_train.values - y_train.mean())**2)
+
+r2_train = 1 - sse_train / sst_train
+print(f"Train R^2: {r2_train:.4f}")
+
 
 
 y_pred_test = np.dot(X_test, weight) + bias
@@ -104,6 +95,15 @@ test_mse = mean_squared_error(y_test, y_pred_test)
 
 print(f"Test MSE: {test_mse:.6f}")
 print(f"Real: {y_test.values[-1]}, Predikce: {y_pred_test[-1]}")
+
+
+# R^2
+sse_test = np.sum((y_test.values - y_pred_test)**2)
+sst_test = np.sum((y_test.values - y_test.mean())**2)
+
+r2_test = 1 - sse_test / sst_test
+print(f"Test R^2: {r2_test:.4f}")
+
 
 plt.plot(y_test.values, label='Skutečný log-return')
 plt.plot(y_pred_test, label='Predikce test')
@@ -114,12 +114,7 @@ plt.show()
 
 
 ### LOGIT
-y = (y > 0.005).astype(int)
-
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, shuffle = False)
-
-
+y_train_d, y_test_d = (y_train > 0.005).astype(int), (y_test > 0.005).astype(int)
 
 
 def sigmoid(z):
@@ -135,11 +130,11 @@ for epoch in range(epochs):
     z = np.dot(X_train, weight) + bias
     y_pred = sigmoid(z)
     # Binary cross-entropy loss
-    loss = -np.mean(y_train * np.log(y_pred + 1e-8) + (1 - y_train) * np.log(1 - y_pred + 1e-8))
+    loss = -np.mean(y_train_d * np.log(y_pred + 1e-8) + (1 - y_train_d) * np.log(1 - y_pred + 1e-8))
     loss_history.append(loss)
 
     # Gradient
-    error = y_pred - y_train
+    error = y_pred - y_train_d
     weight_grad = np.dot(X_train.T, error) / X_train.shape[0]
     bias_grad = np.sum(error) / X_train.shape[0]
 
@@ -149,11 +144,28 @@ for epoch in range(epochs):
     if epoch % 1000 == 0:
         print(f"Epoch {epoch}, Loss: {loss:.6f}")
 
+
 # Predikce na testu
 y_pred_test = sigmoid(np.dot(X_test, weight) + bias)
-y_pred_class = (y_pred_test > 0.35).astype(int)
 
-print(f"Trefeno 1: {np.sum((y_pred_class == y_test) & (y_pred_class == 1))} Trefeno 0: {np.sum((y_pred_class == y_test) & (y_pred_class == 0))}, Celkem: {len(y_pred_class)}")
+threshold = 0.35
+y_pred_class = (y_pred_test > threshold).astype(int)
 
-from sklearn.metrics import accuracy_score
-print("Test accuracy:", accuracy_score(y_test, y_pred_class))
+
+# Metrics
+# print(f"Trefeno 1: {np.sum((y_pred_class == y_test_d) & (y_pred_class == 1))} Trefeno 0: {np.sum((y_pred_class == y_test_d) & (y_pred_class == 0))}, Celkem: {len(y_pred_class)}")
+
+print(f"Test accuracy: {accuracy_score(y_test_d, y_pred_class)}")
+
+cm = confusion_matrix(y_test_d, y_pred_class)
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=[0,1], yticklabels=[0,1])
+plt.xlabel("Predicted")
+plt.ylabel("Real")
+plt.title("Confusion Matrix")
+plt.show()
+
+print(classification_report(y_test_d, y_pred_class))
+
+print(f"Log loss: {log_loss(y_test_d, y_pred_test)}")
+
+print(f"Roc auc: {roc_auc_score(y_test_d, y_pred_test)}")
