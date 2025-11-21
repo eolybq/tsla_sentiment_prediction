@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error, accuracy_score, log_loss, roc_auc_score, confusion_matrix, classification_report
+from sklearn.metrics import mean_squared_error, mean_absolute_error, accuracy_score, log_loss, roc_auc_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
 
 df = pd.read_csv('../cleandata/processed_data.csv')
@@ -68,17 +68,19 @@ for epoch in range(epochs):
     weight -= rate * weight_grad
     bias -= rate * bias_grad
 
-    mse = (1 / X_train.shape[0]) * np.sum(np.square(y_pred - y_train))
+    mse = (1 / X_train.shape[0]) * np.sum(np.square(error))
     mse_history.append(mse)
 
     if epoch % 100 == 0:
-        print(f"Epoch {epoch}, MSE: {mse:.6f}", weight)
-
+        print(f"Epoch {epoch}, MSE: {mse:.6f}")
 
 plt.plot(y_train.values, label='Skutečný log-return')
 plt.plot(y_pred, label='Predikce train')
 plt.legend()
 plt.show()
+
+
+
 
 
 # R^2
@@ -92,6 +94,17 @@ print(f"Train R^2: {r2_train:.4f}")
 
 y_pred_test = np.dot(X_test, weight) + bias
 test_mse = mean_squared_error(y_test, y_pred_test)
+test_rmse = np.sqrt(test_mse)
+test_mae = mean_absolute_error(y_test, y_pred_test)
+
+# naive forecast: y_{t-1}
+naive_pred = y_test.shift(1).dropna()
+naive_mse = mean_squared_error(y_test.iloc[1:], naive_pred)
+naive_rmse = np.sqrt(naive_mse)
+naive_mae = mean_absolute_error(y_test.iloc[1:], naive_pred)
+
+test_mase = test_mae / naive_mae
+
 
 print(f"Test MSE: {test_mse:.6f}")
 print(f"Real: {y_test.values[-1]}, Predikce: {y_pred_test[-1]}")
@@ -104,10 +117,39 @@ sst_test = np.sum((y_test.values - y_test.mean())**2)
 r2_test = 1 - sse_test / sst_test
 print(f"Test R^2: {r2_test:.4f}")
 
+metrics_df = pd.DataFrame({
+    "Model": ["GD LinearRegression", "Naive"],
+    "MSE": [test_mse, naive_mse],
+    "RMSE": [test_rmse, naive_rmse],
+    "MAE": [test_mae, naive_mae],
+    "MASE": [test_mase, 1.0000],
+    "R^2": [r2_test, ""]
+})
+metrics_df.to_excel("../plots_tabs/metrics.xlsx", index=False)
 
-plt.plot(y_test.values, label='Skutečný log-return')
-plt.plot(y_pred_test, label='Predikce test')
-plt.legend()
+
+custom_colors = {
+    'y_pred': '#1717c1',
+    'y_test': '#4D4D4D',
+}
+
+y_test_df = pd.DataFrame({
+    'log_return': y_test.values,
+    'variable': 'y_test'
+}).reset_index()
+
+y_pred_df = pd.DataFrame({
+    'log_return': y_pred_test,
+    'variable': 'y_pred'
+}).reset_index()
+
+test_pred_df = pd.concat([y_test_df, y_pred_df], ignore_index=True, axis=0)
+
+sns.lineplot(data=test_pred_df, x="index", y='log_return', hue='variable', palette=custom_colors)
+plt.xlabel('')
+plt.ylabel('Log return')
+plt.title("Gradient Descent LinearRegression")
+plt.savefig("../plots_tabs/gd_lr.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 
@@ -123,7 +165,7 @@ def sigmoid(z):
 weight = np.zeros(X_train.shape[1])
 bias = 0
 rate = 0.008
-epochs = 100000
+epochs = 20000
 loss_history = []
 
 for epoch in range(epochs):

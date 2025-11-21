@@ -616,7 +616,7 @@ metrics <- bind_rows(metrics, naive_metrics)
 print(metrics)
 sd(trans_tdata$close)
 
-write_xlsx(metrics, "plots_tabs/metrics.xlsx")
+write_xlsx(metrics, "r/plots_tabs/metrics.xlsx")
 
 
 
