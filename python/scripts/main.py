@@ -125,7 +125,7 @@ metrics_df = pd.DataFrame({
     "MASE": [test_mase, 1.0000],
     "R^2": [r2_test, ""]
 })
-metrics_df.to_excel("../plots_tabs/metrics.xlsx", index=False)
+metrics_df.to_excel("../plots_tabs/gd_lr_metrics.xlsx", index=False)
 
 
 custom_colors = {
@@ -197,17 +197,47 @@ y_pred_class = (y_pred_test > threshold).astype(int)
 # Metrics
 # print(f"Trefeno 1: {np.sum((y_pred_class == y_test_d) & (y_pred_class == 1))} Trefeno 0: {np.sum((y_pred_class == y_test_d) & (y_pred_class == 0))}, Celkem: {len(y_pred_class)}")
 
-print(f"Test accuracy: {accuracy_score(y_test_d, y_pred_class)}")
+
+acc = accuracy_score(y_test_d, y_pred_class)
+log_l = log_loss(y_test_d, y_pred_test)
+roc_auc = roc_auc_score(y_test_d, y_pred_test)
+
+metrics_df = pd.DataFrame({
+    "Model": ["GD LogisticRegression"],
+    "Accuracy": [acc],
+    "Log Loss": [log_l],
+    "ROC AUC": [roc_auc]
+})
+
+metrics_df.to_excel("../plots_tabs/gd_log_metrics.xlsx", index=False)
+
+print(f"Test accuracy: {acc:.4f}")
+print(f"Log loss: {log_l:.6f}")
+print(f"Roc auc: {roc_auc:.6f}")
+
+print(classification_report(y_test_d, y_pred_class))
 
 cm = confusion_matrix(y_test_d, y_pred_class)
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=[0,1], yticklabels=[0,1])
 plt.xlabel("Predicted")
-plt.ylabel("Real")
+plt.ylabel("Actual")
 plt.title("Confusion Matrix")
+plt.savefig("../plots_tabs/conf_matrix.png", dpi=300, bbox_inches='tight')
 plt.show()
 
-print(classification_report(y_test_d, y_pred_class))
 
-print(f"Log loss: {log_loss(y_test_d, y_pred_test)}")
+custom_colors = {
+    'Actual': '#4D4D4D',
+    'Predicted': '#1717c1'
+}
 
-print(f"Roc auc: {roc_auc_score(y_test_d, y_pred_test)}")
+df_plot = pd.DataFrame({
+    "Actual": y_test_d,
+    "Predicted": y_pred_class
+})
+
+sns.countplot(data=pd.melt(df_plot), x="value", hue="variable", palette=custom_colors)
+plt.title("Gradient Descent LogisticRegression")
+plt.xlabel("")
+plt.savefig("../plots_tabs/gd_log.png", dpi=300, bbox_inches='tight')
+plt.show()

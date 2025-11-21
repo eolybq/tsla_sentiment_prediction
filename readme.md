@@ -32,7 +32,9 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 **Unconventional data, uncoventional models**
 - Main programming language: Python
 
-- Project aims to extend Part 1 of this project. Extension lies in using python instead of R to create machine-learning models and their prediction evaluations. Then compare traditional time-series models and these models to get result of perfomance on financial data. At the moment there is Gradient Descent Linear Regression and Gradient Descend Logistic Regression done, written from scratch.
+- Project aims to extend Part 1 of this project. Extension lies in using python instead of R to create machine-learning models and their prediction evaluations. Then compare traditional time-series models and these models to get result of perfomance on financial data.
+- Part 2 also explores classification ML methods which cannot be directly compared to regression based models from Part 1
+- At the moment there is Gradient Descent Linear Regression and Gradient Descend Logistic Regression done, written from scratch.
 - LSTM is planned aswell.
 
 
@@ -62,7 +64,9 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 - Basic univariate ARIMA model without unique data used in this project beats ARIMAX with this data aswell as multivariate models.
 - Every model beats Naive model
 
-### Gradient Descent Linear Regression (Part 2)
+### Gradient Descent Linear Regression / Logistic Regression (Part 2)
+
+**Regression:**
 
 | Model                   | MSE        | RMSE       | MAE        | MASE       | R^2        |
 |-------------------------|------------|------------|------------|------------|------------|
@@ -74,8 +78,26 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 - Part 2 uses slightly different indexes of train/test data (train_test_split vs rolling window in Part 1)
 - Model beats Naive model 
 
+**Classification:**
+
+| Model                     | Accuracy   | Log Loss   | ROC AUC    |
+|---------------------------|------------|------------|------------|
+| **GD LogisticRegression** | **0.5680** | **0.6721** | **0.6090** |
+
+- Model shows accuracy slightly better than randomness (0.5)
+- Log loss is relatively high, which means weakly calibrated predicted probabilities
+- On ROC AUC metric, model shows relatively weak ability to differentiate between classes across different thresholds
+
+### All of these numeric metrics are in line with forecasting difficulty in stock returns and real assumption that, stock price movements are mostly random and can't be reliably predicted based on financial indicators + sentiment signals from tweets doesn't have strong predictive power.
+
 ### Predictions in plot:
 **Part 1**
 ![TS models](r/plots_tabs/preds.png)
+
+
 **Part 2**
 ![GD LinearRegression](python/plots_tabs/gd_lr.png)
+![GD LogisticRegression](python/plots_tabs/gd_log.png)
+![Confusion matrix](python/plots_tabs/conf_matrix.png)
+- **NOTE:**  
+1 express that log_return is > 0.005 (log return rises atleast by this "significance" threshold) and 0 otherwise (log return is constant or negative)
