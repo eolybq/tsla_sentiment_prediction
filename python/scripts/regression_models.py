@@ -50,7 +50,10 @@ for column in X_train.columns:
 
 X_train, X_test = np.array(X_train), np.array(X_test)
 
-### GRADIENT DESCENT LINEAR REGRESSION
+
+
+
+# -----GRADIENT DESCENT LINEAR REGRESSION------
 weight = np.zeros(X.shape[1])
 bias = 0
 rate = 0.01
@@ -155,7 +158,7 @@ plt.show()
 
 
 
-### LOGIT
+# -----LOGIT------
 y_train_d, y_test_d = (y_train > 0.005).astype(int), (y_test > 0.005).astype(int)
 
 
