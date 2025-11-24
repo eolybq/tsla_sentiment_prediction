@@ -224,8 +224,8 @@ cm = confusion_matrix(y_test_d, y_pred_class)
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=[0,1], yticklabels=[0,1])
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
-plt.title("Confusion Matrix")
-plt.savefig("../plots_tabs/conf_matrix.png", dpi=300, bbox_inches='tight')
+plt.title("GD Logit Confusion Matrix")
+plt.savefig("../plots_tabs/gd_log_conf_m.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 
@@ -242,5 +242,5 @@ df_plot = pd.DataFrame({
 sns.countplot(data=pd.melt(df_plot), x="value", hue="variable", palette=custom_colors)
 plt.title("Gradient Descent LogisticRegression")
 plt.xlabel("")
-plt.savefig("../plots_tabs/gd_log.png", dpi=300, bbox_inches='tight')
+# plt.savefig("../plots_tabs/gd_log.png", dpi=300, bbox_inches='tight')
 plt.show()

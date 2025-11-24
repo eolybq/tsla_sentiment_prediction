@@ -6,6 +6,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, accuracy_sc
 import seaborn as sns
 import matplotlib.pyplot as plt
 import graphviz
+from tqdm import tqdm
 
 
 df = pd.read_csv('../cleandata/processed_data.csv')
@@ -54,7 +55,7 @@ X, y_clf = np.array(X), np.array(y_clf)
 y_pred_test = []
 y_clf_history = []
 
-for i in range(window, len(X)):
+for i in tqdm(range(window, len(X)), desc="Training"):
     start = i - window
 
     dtc = DecisionTreeClassifier(criterion='gini', max_depth=5, random_state=42)
@@ -66,6 +67,7 @@ for i in range(window, len(X)):
     y_pred_test.append(prediction)
 
     y_clf_history.append(y_clf[i])
+    print()
     print(f"Prediction: {prediction:.4f}, Actual: {y_clf[i]}")
 
 
@@ -96,7 +98,7 @@ plt.show()
 y_pred_test = np.array(y_pred_test)
 y_clf_history = np.array(y_clf_history)
 
-threshold = 0.5
+threshold = 0.42
 y_pred_class = (y_pred_test > threshold).astype(int)
 
 
@@ -105,13 +107,13 @@ log_l = log_loss(y_clf_history, y_pred_class)
 roc_auc = roc_auc_score(y_clf_history, y_pred_class)
 
 metrics_df = pd.DataFrame({
-     "Model": ["Decision tree classifier"],
+     "Model": ["DecisionTreeClassifier"],
      "Accuracy": [acc],
      "Log Loss": [log_l],
      "ROC AUC": [roc_auc]
 })
 
-# metrics_df.to_excel("../plots_tabs/gd_log_metrics.xlsx", index=False)
+metrics_df.to_excel("../plots_tabs/dtc_metrics.xlsx", index=False)
 
 print(f"Test accuracy: {acc:.4f}")
 print(f"Log loss: {log_l:.6f}")
@@ -123,8 +125,8 @@ cm = confusion_matrix(y_clf_history, y_pred_class)
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=[0,1], yticklabels=[0,1])
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
-plt.title("DTCConfusion Matrix")
-#plt.savefig("../plots_tabs/conf_matrix.png", dpi=300, bbox_inches='tight')
+plt.title("DTC Confusion Matrix")
+plt.savefig("../plots_tabs/dtc_conf_m.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 custom_colors = {
@@ -165,7 +167,7 @@ X, y = np.array(X), np.array(y)
 y_pred_test = []
 y_history = []
 
-for i in range(window, len(X)):
+for i in tqdm(range(window, len(X)), desc="Training"):
     start = i - window
 
     dtr = DecisionTreeRegressor(max_depth=5, random_state=42)
@@ -177,6 +179,7 @@ for i in range(window, len(X)):
     y_pred_test.append(prediction)
 
     y_history.append(y[i])
+    print()
     print(f"Prediction: {prediction}, Actual: {y[i]}")
 
 
@@ -240,7 +243,7 @@ metrics_df = pd.DataFrame({
     "MASE": [test_mase, 1.0000],
     "R^2": [r2_test, ""]
 })
-# metrics_df.to_excel("../plots_tabs/gd_lr_metrics.xlsx", index=False)
+metrics_df.to_excel("../plots_tabs/dtr_metrics.xlsx", index=False)
 
 
 custom_colors = {
@@ -264,5 +267,5 @@ sns.lineplot(data=test_pred_df, x="index", y='log_return', hue='variable', palet
 plt.xlabel('')
 plt.ylabel('Log return')
 plt.title("Decision Tree Regressor")
-#plt.savefig("../plots_tabs/gd_lr.png", dpi=300, bbox_inches='tight')
+plt.savefig("../plots_tabs/dtr.png", dpi=300, bbox_inches='tight')
 plt.show()
