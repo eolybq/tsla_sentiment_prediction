@@ -4,6 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from xgboost import XGBClassifier, plot_importance, plot_tree, to_graphviz
 from sklearn.metrics import accuracy_score, log_loss, roc_auc_score, classification_report, confusion_matrix
+from tqdm import tqdm
 
 df = pd.read_csv('../cleandata/processed_data.csv')
 
@@ -36,7 +37,7 @@ def create_lags(lags):
 print("-----XGBoost Classifier-----")
 
 lags = 10
-window = 3300
+window = 2630
 
 X = create_lags(lags)
 features_names = X.columns
@@ -49,30 +50,31 @@ X, y_clf = np.array(X), np.array(y_clf)
 y_pred_test = []
 y_clf_history = []
 
-for i in range(window, len(X)):
+for i in tqdm(range(window, len(X)), desc="Training"):
     start = i - window
 
-    bst_clf = XGBClassifier(objective="binary:logistic", max_depth=5, n_estimators=500, learning_rate=0.1, random_state=42, n_jobs=-1)
-    bst_clf.fit(X[start:i, ], y_clf[start:i])
+    xgb_c = XGBClassifier(objective="binary:logistic", max_depth=5, n_estimators=500, learning_rate=0.1, random_state=42, n_jobs=-1)
+    xgb_c.fit(X[start:i, ], y_clf[start:i])
 
     test = (X[i]).reshape(1, -1)
 
-    prediction = bst_clf.predict_proba(test)[0][1]
+    prediction = xgb_c.predict_proba(test)[0][1]
     y_pred_test.append(prediction)
 
     y_clf_history.append(y_clf[i])
+    print()
     print(f"Prediction: {prediction:.4f}, Actual: {y_clf[i]}")
 
 
-graph = to_graphviz(bst_clf, num_trees=0)
+graph = to_graphviz(xgb_c, num_trees=0)
 graph.render("../plots_tabs/xgb_tree_class")  # uloží do xgb_tree.pdf
 graph.view()
 
 
-plot_importance(bst_clf, importance_type='gain')
+plot_importance(xgb_c, importance_type='gain')
 plt.show()
 
-plot_importance(bst_clf)
+plot_importance(xgb_c)
 plt.show()
 
 
@@ -95,7 +97,7 @@ metrics_df = pd.DataFrame({
      "ROC AUC": [roc_auc]
 })
 
-# metrics_df.to_excel("../plots_tabs/gd_log_metrics.xlsx", index=False)
+metrics_df.to_excel("../plots_tabs/xgbc_metrics.xlsx", index=False)
 
 print(f"Test accuracy: {acc:.4f}")
 print(f"Log loss: {log_l:.6f}")
@@ -107,8 +109,8 @@ cm = confusion_matrix(y_clf_history, y_pred_class)
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=[0,1], yticklabels=[0,1])
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
-plt.title("BST_CLF Confusion Matrix")
-#plt.savefig("../plots_tabs/conf_matrix.png", dpi=300, bbox_inches='tight')
+plt.title("XGB Classifier Confusion Matrix")
+plt.savefig("../plots_tabs/xgbc_conf_m.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 custom_colors = {

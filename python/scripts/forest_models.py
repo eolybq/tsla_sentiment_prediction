@@ -6,6 +6,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, accuracy_sc
 import seaborn as sns
 import matplotlib.pyplot as plt
 import graphviz
+from tqdm import tqdm
 
 
 df = pd.read_csv('../cleandata/processed_data.csv')
@@ -39,7 +40,7 @@ def create_lags(lags):
 print("-----Random Forest Classifier-----")
 
 lags = 10
-window = 2670
+window = 2630
 
 X = create_lags(lags)
 features_names = X.columns
@@ -52,7 +53,7 @@ X, y_clf = np.array(X), np.array(y_clf)
 y_pred_test = []
 y_clf_history = []
 
-for i in range(window, len(X)):
+for i in tqdm(range(window, len(X)), desc="Training"):
     start = i - window
 
     rfc = RandomForestClassifier(n_estimators=500, criterion='gini', max_depth=5, random_state=42, n_jobs=-1)
@@ -64,6 +65,7 @@ for i in range(window, len(X)):
     y_pred_test.append(prediction)
 
     y_clf_history.append(y_clf[i])
+    print()
     print(f"Prediction: {prediction:.4f}, Actual: {y_clf[i]}")
 
 
@@ -122,7 +124,7 @@ metrics_df = pd.DataFrame({
      "ROC AUC": [roc_auc]
 })
 
-# metrics_df.to_excel("../plots_tabs/gd_log_metrics.xlsx", index=False)
+metrics_df.to_excel("../plots_tabs/rfc_metrics.xlsx", index=False)
 
 print(f"Test accuracy: {acc:.4f}")
 print(f"Log loss: {log_l:.6f}")
@@ -135,7 +137,7 @@ sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=[0,1], yticklabel
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("RFC Confusion Matrix")
-#plt.savefig("../plots_tabs/conf_matrix.png", dpi=300, bbox_inches='tight')
+plt.savefig("../plots_tabs/rfc_conf_m.png", dpi=300, bbox_inches='tight')
 plt.show()
 
 custom_colors = {

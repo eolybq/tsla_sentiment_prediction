@@ -18,6 +18,7 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 2. **Prediction Approaches:**  
    - Implementing ARIMA or VAR with exogenous variables for improved accuracy, as pure endogenous approach might be less suitable when some of exogenous indicators (VIX, bulish bearish spread..) do not directly influence the target stock price.  
    - Try alternative basic ML methods to compare them with traditional time series models
+   - Try to incorporate classification prediction task as predicting wheter log return is positive or neutral / negative
 
 
 ### Part 1 (directory r/)
@@ -33,8 +34,10 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 - Main programming language: Python
 
 - Project aims to extend Part 1 of this project. Extension lies in using python instead of R to create machine-learning models and their prediction evaluations. Then compare traditional time-series models and these models to get result of perfomance on financial data.
-- Part 2 also explores classification ML methods which cannot be directly compared to regression based models from Part 1
+- Part 2 also explores classification ML methods which cannot be directly compared to regression task models from Part 1
+- Classification is based on predicting artificialy created binary variable, which takes on value 1 if stock log return went over some "significance" treshold (0.005)
 - At the moment there is Gradient Descent Linear Regression and Gradient Descend Logistic Regression done, written from scratch.
+- Also Decision Tree classification and regression, Random Forest and XGBoost classification using sk-learn, xgboost libraries are done. (trained recursively on rolling window - walk forward prediction validation)
 - LSTM is planned aswell.
 
 
@@ -49,7 +52,7 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 
 ## Outcomes
 
-### ARIMA, ARIMAX, VAR, VARX (Part 1)
+### Traditional time series models (Part 1)
 
 **Predictions evaluation across models:**
 
@@ -64,13 +67,14 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 - Basic univariate ARIMA model without unique data used in this project beats ARIMAX with this data aswell as multivariate models.
 - Every model beats Naive model
 
-### Gradient Descent Linear Regression / Logistic Regression (Part 2)
+### Unconventional models (ML models) (Part 2)
 
 **Regression:**
 
 | Model                   | MSE        | RMSE       | MAE        | MASE       | R^2        |
 |-------------------------|------------|------------|------------|------------|------------|
 | **GD LinearRegression** | **0.0014** | **0.0368** | **0.0277** | **0.6765** | **0.0669** |
+| DecisionTreeRegressor   | 0.0016     | 0.0398     | 0.0289     | 0.6991     | -0.0808    |
 | Naive                   | 0.0029     | 0.0537     | 0.0410     | 1.0000     | -          |
 
 - Model gets approximately same results as best model from Part 1 (univariate ARIMA)
@@ -83,12 +87,19 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 | Model                     | Accuracy   | Log Loss   | ROC AUC    |
 |---------------------------|------------|------------|------------|
 | **GD LogisticRegression** | **0.5680** | **0.6721** | **0.6090** |
+| DecisionTreeClassifier    | 0.5382     | 16.6434    | 0.5165     |
+| RandomForestClassifier    | 0.5326     | 0.6814     | 0.5381     |
+| XGBoostClassifier         | 0.5326     | 0.8270     | 0.5268     |
 
-- Model shows accuracy slightly better than randomness (0.5)
-- Log loss is relatively high, which means weakly calibrated predicted probabilities
-- On ROC AUC metric, model shows relatively weak ability to differentiate between classes across different thresholds
+- Models show accuracy slightly better than randomness (0.5)
+- Log loss for Decision Tree is very high, which means weakly calibrated predicted probabilities - models is often sure with prediction that is wrong
+- On ROC AUC metric, models show relatively weak ability to differentiate between classes across different thresholds
 
-### All of these numeric metrics are in line with forecasting difficulty in stock returns and real assumption that, stock price movements are mostly random and can't be reliably predicted based on financial indicators + sentiment signals from tweets doesn't have strong predictive power.
+
+### Short-term stock returns exhibit very low predictability. All tested models achieved only marginal improvements over randomness, which is consistent with the known difficulty of short-horizon financial forecasting. Moreover, sentiment extracted from tweets does not provide strong predictive power in these settings.
+**There aren't any significant patterns/relationships in this data finded, which when modeled with these models, could be reliably used to predict log return, or rise/other binary variable of TSLA. All classificator models shows accuracy slightly above 0.50 and regressor shows similar MSE to basic ARIMA of low order, which also by plot show weak oscilation around mean (~0) of the log return ts.**
+- **NOTE**:  
+When trying also simple Decision Trees and Random Forest only with past values of log return (1-10 lags) to avoid using irelevant features (all of the used features also doesn't really show high abs corellation with y), results are similar, ofter worse
 
 ### Predictions in plot:
 **Part 1**
@@ -97,7 +108,11 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 
 **Part 2**
 ![GD LinearRegression](python/plots_tabs/gd_lr.png)
-![GD LogisticRegression](python/plots_tabs/gd_log.png)
-![Confusion matrix](python/plots_tabs/conf_matrix.png)
+![GD Logit Confusion matrix](python/plots_tabs/gd_log_conf_m.png)
+![DecisionTreeRegressor](python/plots_tabs/dtr.png)
+![DecisionTreeClassifier Confusion Matrix](python/plots_tabs/dtc_conf_m.png)
+![RandomForestClassifier Confusion Matrix](python/plots_tabs/rfc_conf_m.png)
+![XGBoostClassifier Confusion Matrix](python/plots_tabs/xgbc_conf_m.png)
+
 - **NOTE:**  
 1 express that log_return is > 0.005 (log return rises atleast by this "significance" threshold) and 0 otherwise (log return is constant or negative)
