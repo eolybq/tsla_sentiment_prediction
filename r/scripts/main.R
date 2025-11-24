@@ -3,7 +3,6 @@ rm(list = ls())
 library(conflicted)
 conflict_prefer("select", "dplyr")
 conflict_prefer("VAR", "vars")
-library(progress)
 library(tidyverse)
 library(tseries)
 library(corrr)
@@ -90,19 +89,6 @@ ggplot(tibble_data, aes(x = date)) +
     geom_line(aes(y = close), color = "blue") +
     labs(title = "Vývoj závěrečné ceny", y = "Cena", x = "Datum")
 
-ggplot(tibble_data, aes(x = date)) +
-    geom_line(aes(y = volume), color = "darkgreen") +
-    labs(title = "Objem obchodů", y = "Volume")
-
-ggplot(tibble_data, aes(x = date)) +
-    geom_line(aes(y = basic_volatility), color = "red") +
-    labs(title = "Základní volatilita", y = "Volatilita")
-
-ggplot(tibble_data, aes(x = date)) +
-    geom_line(aes(y = close), color = "black") +
-    geom_line(aes(y = bb_up), color = "blue", linetype = "dashed") +
-    geom_line(aes(y = bb_dn), color = "red", linetype = "dashed") +
-    labs(title = "Bollinger Bands")
 
 ggplot(tibble_data, aes(x = date)) +
     geom_line(aes(y = close), color = "black") +
@@ -447,16 +433,6 @@ results <- tibble(
 )
 
 
-
-
-
-pb <- progress_bar$new(
-    total = n_iter,
-    format = "  [:bar] :percent ETA: :eta",
-    clear = FALSE,
-    width = 60
-)
-
 # MAIN LOOP
 for (i in 1:n_iter) {
     actual_value <- var_data[i + window_size, "close", drop = TRUE]
@@ -480,13 +456,6 @@ for (i in 1:n_iter) {
     xreg_arima <- window_exog[(var_lag - arima_lag):nrow(window_exog), ]
 
 
-    # TODO: mozna osetrit kvuli error
-    # fit <- tryCatch({
-    # arima(train_arima, order = c(p, 0, q), method = "ML")
-    # }, error = function(e) {
-    # return(NA)  # nebo jiná logika, např. zkus jiný model
-    # })
-    # ARIMA
     arima_model <- arima(
         train_arima,
         order = c(arima_lag, 0, arima_lag),
@@ -540,11 +509,6 @@ for (i in 1:n_iter) {
             var_pred = as.numeric(var_pred),
             varx_pred = as.numeric(varx_pred)
         )
-
-
-
-    # Tick progress
-    # pb$tick()
 }
 
 
@@ -553,24 +517,9 @@ naive_pred <- c(NA, results$actual[-length(results$actual)])
 
 # Funkce pro výpočet metrik
 calc_metrics <- function(actual, predicted) {
-    # Odstraníme případy, kde actual je 0 pro výpočet MAPE
-    nonzero_idx <- actual != 0
-    
     mse <- mean((actual - predicted)^2, na.rm = TRUE)
     rmse <- sqrt(mse)
     mae <- mean(abs(actual - predicted), na.rm = TRUE)
-    
-    # NOTE: Extremni hodnoty asi protoze actuals blizko 0, nedava smysl
-    # mape <- if (any(nonzero_idx)) {
-    #     mean(abs((actual[nonzero_idx] - predicted[nonzero_idx]) / actual[nonzero_idx]), na.rm = TRUE) * 100
-    # } else {
-    #     NA_real_
-    # }
-    # 
-    # # SMAPE
-    # denominator <- (abs(actual) + abs(predicted)) / 2
-    # smape_vals <- ifelse(denominator == 0, 0, abs(predicted - actual) / denominator)
-    # smape <- mean(smape_vals, na.rm = TRUE) * 100
     
     # MASE (porovnání s naivní jednofázovou predikcí)
     naive_errors <- abs(diff(actual))  # rozdíl mezi actual[t] a actual[t-1]
@@ -590,8 +539,6 @@ metrics <- tibble(
     MSE = NA_real_,
     RMSE = NA_real_,
     MAE = NA_real_,
-    # MAPE = NA_real_,
-    # SMAPE = NA_real_
     MASE = NA_real_,
 )
 
