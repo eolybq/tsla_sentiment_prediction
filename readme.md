@@ -77,9 +77,9 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 | DecisionTreeRegressor   | 0.0016     | 0.0398     | 0.0289     | 0.6991     | -0.0808    |
 | Naive                   | 0.0029     | 0.0537     | 0.0410     | 1.0000     | -          |
 
-- Model gets approximately same results as best model from Part 1 (univariate ARIMA)
-- R^2 is relatively small (small % of log_return variability explained) which could be anticipated for linear model predicting complex relationships in stock data
-- Part 2 uses slightly different indexes of train/test data (train_test_split vs rolling window in Part 1)
+- Best model here gets approximately same results as best model from Part 1 (univariate ARIMA)
+- R^2 is relatively small or even negative (small % of log_return variability explained) which could be anticipated for linear model predicting complex relationships in stock data
+- GD LinearRegression and LOGIT use slightly different indexes of train/test data (train_test_split vs rolling window for other ML models and Part 1)
 - Model beats Naive model 
 
 **Classification:**
