@@ -16,7 +16,7 @@ This project also introduces unusual data - sentiment indicator derived from Elo
    - Evaluate models on prediction accuracy
 
 2. **Prediction Approaches:**  
-   - Implementing ARIMA or VAR with exogenous variables for improved accuracy, as pure endogenous approach might be less suitable when some of exogenous indicators (VIX, bulish bearish spread..) do not directly influence the target stock price.  
+   - Implementing ARIMA or VAR with exogenous variables for improved accuracy, as pure endogenous approach might be less suitable when some of exogenous indicators (VIX, bulish bearish spread..) are not directly influenced by the target stock price.  
    - Try alternative basic ML methods to compare them with traditional time series models
    - Try to incorporate classification prediction task as predicting wheter log return is positive or neutral / negative
 
