@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 df = pd.read_csv('../cleandata/processed_data.csv')
 
+# TODO udealt feature selection - oddelat rsi a macd_signal a podobne blbosti
 features = [
     'vix', 'sentiment_neutral', 'sentiment_positive', 'sentiment_negative', "sentiment_none", 'g_trends',
     'bull_bear_spread_surv', 'volume', 'sma_20',
