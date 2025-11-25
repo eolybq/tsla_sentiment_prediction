@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier, export_graphviz, DecisionTreeRegressor
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, accuracy_score, log_loss, roc_auc_score, confusion_matrix, classification_report
 import seaborn as sns
 import matplotlib.pyplot as plt
