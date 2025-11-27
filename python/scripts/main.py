@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.metrics import f1_score
 import joblib
 import glob
 from tqdm import tqdm
@@ -21,10 +22,12 @@ df.dropna(inplace=True)
 # PCA?
 
 features = [
-    'log_return', 'vix', 'sentiment_neutral', 'sentiment_positive', 'sentiment_negative', 'sentiment_none', 'g_trends',
-    'bull_bear_spread_surv', 'volume', 'sma_20',
-    'sma_50', 'ema_20', 'basic_volatility', 'atr', 'rsi', 'macd',
-    'macd_signal', 'bb_up', 'bb_dn', 'obv', 'stochrsi', 'adx'
+    # Unused
+    # sma_20, sma_50, stochrsi, macd_signal, bb_up, bb_dn, g_trends
+
+    'log_return', 'vix', 'sentiment_neutral', 'sentiment_positive', 'sentiment_negative', 'sentiment_none',
+    'bull_bear_spread_surv', 'volume', 'ema_20', 'basic_volatility', 'atr', 'macd',
+    'obv', 'rsi', 'adx'
 ]
 
 features_lin_models = features.copy()
@@ -57,14 +60,11 @@ y, y_clf = y[lags:], y_clf[lags:]
 # X, y, y_clf = np.array(X), np.array(y), np.array(y_clf)
 
 
-pred_threshold = 0.5
 learning_rate = 0.01
 epochs = 10_000
 
 
-
 window = 2630
-
 
 preds_df = pd.DataFrame(
     np.nan,
@@ -101,7 +101,7 @@ for i in tqdm(range(window, len(X)), desc="Training"):
     gd_lr_y_pred = train_gd_lr(X_train, X_test, y_train, learning_rate, epochs)
     preds_df.loc[i, 'GD LinearRegression'] = gd_lr_y_pred
 
-    gd_logit_y_pred_class, gd_logit_y_pred_proba = train_gd_logit(X_train, X_test, y_clf_train, pred_threshold, learning_rate, epochs)
+    gd_logit_y_pred_proba = train_gd_logit(X_train, X_test, y_clf_train, learning_rate, epochs)
     preds_df.loc[i, 'GD LogisticRegression'] = gd_logit_y_pred_proba
 
 
@@ -111,7 +111,7 @@ for i in tqdm(range(window, len(X)), desc="Training"):
     dtr_y_pred = train_dtr(X_train, X_test, y_train, max_depth=5, save=save_model_flag)
     preds_df.loc[i, 'DecisionTreeRegressor'] = dtr_y_pred
 
-    dtc_y_pred_class, dtc_y_pred_proba = train_dtc(X_train, X_test, y_clf_train, pred_threshold, max_depth=5, save=save_model_flag)
+    dtc_y_pred_proba = train_dtc(X_train, X_test, y_clf_train, max_depth=5, save=save_model_flag)
     preds_df.loc[i, 'DecisionTreeClassifier'] = dtc_y_pred_proba
 
 
@@ -119,7 +119,7 @@ for i in tqdm(range(window, len(X)), desc="Training"):
     rfr_y_pred = train_rfr(X_train, X_test, y_train, n_estimators=500, max_depth=5, save=save_model_flag)
     preds_df.loc[i, 'RandomForestRegressor'] = rfr_y_pred
 
-    rfc_y_pred_class, rfc_y_pred_proba = train_rfc(X_train, X_test, y_clf_train, pred_threshold, n_estimators=500, max_depth=5, save=save_model_flag)
+    rfc_y_pred_proba = train_rfc(X_train, X_test, y_clf_train, n_estimators=500, max_depth=5, save=save_model_flag)
     preds_df.loc[i, 'RandomForestClassifier'] = rfc_y_pred_proba
 
 
@@ -127,7 +127,7 @@ for i in tqdm(range(window, len(X)), desc="Training"):
     xgbr_y_pred = train_xgbr(X_train, X_test, y_train, n_estimators=500, max_depth=5, save=save_model_flag)
     preds_df.loc[i, 'XGBoostRegressor'] = xgbr_y_pred
 
-    xgbc_y_pred_class, xgbc_y_pred_proba = train_xgbc(X_train, X_test, y_clf_train, pred_threshold, n_estimators=500, max_depth=5, save=save_model_flag)
+    xgbc_y_pred_proba = train_xgbc(X_train, X_test, y_clf_train, n_estimators=500, max_depth=5, save=save_model_flag)
     preds_df.loc[i, 'XGBoostClassifier'] = xgbc_y_pred_proba
 
 
@@ -135,7 +135,7 @@ for i in tqdm(range(window, len(X)), desc="Training"):
     lgbr_y_pred = train_lgbr(X_train, X_test, y_train, n_estimators=500, max_depth=5, save=save_model_flag)
     preds_df.loc[i, 'LightGBMRegressor'] = lgbr_y_pred
 
-    lgbc_y_pred_class, lgbc_y_pred_proba = train_lgbc(X_train, X_test, y_clf_train, pred_threshold, n_estimators=500, max_depth=5, save=save_model_flag)
+    lgbc_y_pred_proba = train_lgbc(X_train, X_test, y_clf_train, n_estimators=500, max_depth=5, save=save_model_flag)
     preds_df.loc[i, 'LightGBMClassifier'] = lgbc_y_pred_proba
 
 
@@ -158,5 +158,16 @@ preds_df = pd.read_csv("../trained_models/predictions.csv", index_col=0)
 
 
 # -----Evaluate-----
+# TODO
 y_test = y[window:]
 y_clf_test = y_clf[window:]
+
+
+# Threshold maximalizujici F1
+thresholds = np.linspace(0, 1, 101)
+f1_scores = [f1_score(y_clf_test, y_pred_proba > t) for t in thresholds]
+best_thresh = thresholds[np.argmax(f1_scores)]
+print("Optimal threshold:", best_thresh)
+
+
+clf_pred_threshold = 0.5

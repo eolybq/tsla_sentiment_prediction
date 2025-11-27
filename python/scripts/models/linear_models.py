@@ -70,7 +70,7 @@ def train_gd_lr(X_train, X_test, y_train, l_rate=0.01, epochs=10_000):
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
-def train_gd_logit(X_train, X_test, y_train, pred_threshold, l_rate=0.01, epochs=10_000):
+def train_gd_logit(X_train, X_test, y_train,l_rate=0.01, epochs=10_000):
     print("-----TRAIN GD Logistic Regression-----")
 
     X_train, X_test = standartize_features(X_train, X_test)
@@ -104,7 +104,6 @@ def train_gd_logit(X_train, X_test, y_train, pred_threshold, l_rate=0.01, epochs
 
     # Predikce na testu
     y_pred_proba = sigmoid(np.dot(X_test, weight) + bias)
-    y_pred_class = (y_pred_proba > pred_threshold).astype(int)
 
     print("-----FINISHED GD Logistic Regression-----")
-    return y_pred_class, y_pred_proba
+    return y_pred_proba

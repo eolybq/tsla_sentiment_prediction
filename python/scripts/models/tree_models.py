@@ -26,7 +26,7 @@ def train_dtr(X_train, X_test, y_train, crit='squared_error', save=False, max_de
 
 
 # -----DECISION TREE CLASS------
-def train_dtc(X_train, X_test, y_train, pred_threshold, crit='gini', save=False, max_depth=5):
+def train_dtc(X_train, X_test, y_train, crit='gini', save=False, max_depth=5):
     print("-----TRAIN Decision Tree Classifier-----")
 
     dtc = DecisionTreeClassifier(criterion=crit, max_depth=max_depth, random_state=42)
@@ -34,14 +34,12 @@ def train_dtc(X_train, X_test, y_train, pred_threshold, crit='gini', save=False,
 
     y_pred_proba = dtc.predict_proba(X_test)[:, 1]
 
-    y_pred_class = (y_pred_proba > pred_threshold).astype(int)
-
     if save:
         joblib.dump(dtc, "../trained_models/dtc_last.pkl")
 
     print("-----FINISHED Decision Tree Classifier-----")
 
-    return y_pred_class, y_pred_proba
+    return y_pred_proba
 
 
 

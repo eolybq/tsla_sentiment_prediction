@@ -27,7 +27,7 @@ def train_rfr(X_train, X_test, y_train, crit='squared_error', save=False, n_esti
 
 
 # ------RANDOM FOREST CLASS------
-def train_rfc(X_train, X_test, y_train, pred_threshold, crit='gini', save=False, n_estimators=500, max_depth=5):
+def train_rfc(X_train, X_test, y_train, crit='gini', save=False, n_estimators=500, max_depth=5):
     print("-----TRAIN Random Forest Classifier-----")
 
     rfc = RandomForestClassifier(n_estimators=n_estimators, criterion=crit, max_depth=max_depth, random_state=42, n_jobs=-1)
@@ -35,12 +35,10 @@ def train_rfc(X_train, X_test, y_train, pred_threshold, crit='gini', save=False,
 
     y_pred_proba = rfc.predict_proba(X_test)[:, 1]
 
-    y_pred_class = (y_pred_proba > pred_threshold).astype(int)
-
     if save:
         joblib.dump(rfc, "../trained_models/rfc_last.pkl")
 
     print("-----FINISHED Random Forest Classifier-----")
 
-    return y_pred_class, y_pred_proba
+    return y_pred_proba
 

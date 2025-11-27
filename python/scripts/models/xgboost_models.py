@@ -31,7 +31,7 @@ def train_xgbr(X_train, X_test, y_train, obj='reg:squarederror', save=False, n_e
 
 
 # ------XGBOOST CLASS-------
-def train_xgbc(X_train, X_test, y_train, pred_threshold, obj='binary:logistic', l_rate=0.1, save=False, n_estimators=500, max_depth=5):
+def train_xgbc(X_train, X_test, y_train, obj='binary:logistic', l_rate=0.1, save=False, n_estimators=500, max_depth=5):
     print("-----TRAIN XGBoost Classifier-----")
 
     xgbc = XGBClassifier(objective=obj, n_estimators=n_estimators, max_depth=max_depth, learning_rate=l_rate, random_state=42, n_jobs=-1)
@@ -39,12 +39,10 @@ def train_xgbc(X_train, X_test, y_train, pred_threshold, obj='binary:logistic', 
 
     y_pred_proba = xgbc.predict_proba(X_test)[:, 1]
 
-    y_pred_class = (y_pred_proba > pred_threshold).astype(int)
-
     if save:
         joblib.dump(xgbc, "../trained_models/xgbc_last.pkl")
 
     print("-----FINISHED XGBoost Classifier-----")
 
-    return y_pred_class, y_pred_proba
+    return y_pred_proba
 
