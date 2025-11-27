@@ -2,8 +2,8 @@ import pandas as pd
 from transformers import pipeline, AutoTokenizer
 from tqdm import tqdm
 
-df = pd.read_csv("../../data/rawdata/tweets_tsla_daily.csv")
-df_not_agr = pd.read_csv("../../data/rawdata/tweets_tsla_not_agregated.csv")
+df = pd.read_csv("../../../data/rawdata/tweets_tsla_daily.csv")
+df_not_agr = pd.read_csv("../../../data/rawdata/tweets_tsla_not_agregated.csv")
 
 tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
 pipe = pipeline("text-classification", model="ProsusAI/finbert", tokenizer=tokenizer, top_k = None)

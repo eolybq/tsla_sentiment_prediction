@@ -109,7 +109,7 @@ When trying also simple Decision Trees and Random Forest only with past values o
 **Part 2**
 ![GD LinearRegression](python/plots_tabs/gd_lr.png)
 ![GD Logit Confusion matrix](python/plots_tabs/gd_log_conf_m.png)
-![DecisionTreeRegressor](python/plots_tabs/dtr.png)
+![DecisionTreeRegressor](python/plots_tabs/dtr_preds.png)
 ![DecisionTreeClassifier Confusion Matrix](python/plots_tabs/dtc_conf_m.png)
 ![RandomForestClassifier Confusion Matrix](python/plots_tabs/rfc_conf_m.png)
 ![XGBoostClassifier Confusion Matrix](python/plots_tabs/xgbc_conf_m.png)
