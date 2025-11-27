@@ -3,6 +3,14 @@ import joblib
 from lightgbm import LGBMRegressor, LGBMClassifier
 
 # TODO pohrat si s hyperparametry - i co nejsou zatim zmineny
+# - GridSearchCV
+
+# GPU
+# gpu_params = {
+#     'device': 'gpu',
+#     'gpu_platform_id': 0,
+#     'gpu_device_id': 0
+# }
 
 
 # -----LIGHTGBM REGG-------

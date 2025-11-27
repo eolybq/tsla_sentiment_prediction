@@ -3,6 +3,10 @@ import joblib
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 
+# TODO pohrat si s hyperparametry - i co nejsou zatim zmineny
+# - GridSearchCV
+
+
 # -----DECISION TREE REGG------
 def train_dtr(X_train, X_test, y_train, crit='squared_error', save=False, max_depth=5):
     print("-----TRAIN Decision Tree Regressor-----")

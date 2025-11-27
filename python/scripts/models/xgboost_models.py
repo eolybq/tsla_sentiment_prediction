@@ -3,7 +3,13 @@ import joblib
 from xgboost import XGBClassifier, XGBRegressor
 
 # TODO pohrat si s hyperparametry - i co nejsou zatim zmineny
+# - GridSearchCV
 
+# GPU
+# gpu_params = {
+#     "tree_method": "hist",
+#     "device": "cuda",
+# }
 
 # ------XGBOOST REGG-------
 def train_xgbr(X_train, X_test, y_train, obj='reg:squarederror', save=False, n_estimators=500, max_depth=5, l_rate=0.1):

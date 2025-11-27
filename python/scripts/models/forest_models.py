@@ -3,6 +3,10 @@ import joblib
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 
+# TODO pohrat si s hyperparametry - i co nejsou zatim zmineny
+# - GridSearchCV
+
+
 # ------RANDOM FOREST REGG------
 def train_rfr(X_train, X_test, y_train, crit='squared_error', save=False, n_estimators=500, max_depth=5):
     print("-----TRAIN Random Forest Regressor-----")

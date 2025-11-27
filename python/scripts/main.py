@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from tqdm import tqdm
 import joblib
 import glob
+from tqdm import tqdm
 
 from models.linear_models import train_gd_lr, train_gd_logit
 from models.tree_models import train_dtr, train_dtc
@@ -27,7 +27,8 @@ features = [
     'macd_signal', 'bb_up', 'bb_dn', 'obv', 'stochrsi', 'adx'
 ]
 
-features_lin_models = features.copy().remove("sentiment_none")
+features_lin_models = features.copy()
+features_lin_models.remove("sentiment_none")
 
 
 
@@ -38,6 +39,7 @@ def create_lags(lags):
     for l in range(1, lags + 1):
         for col in features:
             X[col + f'_lag{l}'] = df[col].shift(l)
+
     X.dropna(inplace=True)
     return X
 
@@ -81,7 +83,7 @@ preds_df = pd.DataFrame(
     ]
 )
 
-preds_df.to_csv("predictions.csv", index=False)
+preds_df.to_csv("../trained_models/predictions.csv", index=True)
 
 # -----Main walk forward loop-----
 for i in tqdm(range(window, len(X)), desc="Training"):
@@ -137,7 +139,8 @@ for i in tqdm(range(window, len(X)), desc="Training"):
     preds_df.loc[i, 'LightGBMClassifier'] = lgbc_y_pred_proba
 
 
-preds_df.to_csv("../trained_models/predictions.csv", index=True)
+    # prubezne ukladnani predikci
+    preds_df.to_csv("../trained_models/predictions.csv", index=True)
 
 
 
