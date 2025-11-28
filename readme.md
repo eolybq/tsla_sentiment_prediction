@@ -83,7 +83,7 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 
 - Best model **RandomForest** gets approximately same results as best model from Part 1 (univariate ARIMA)
 - Most sofisticated models (XGBoost, LightGBM) perform the worst on these metrics, but visual inspection of predictions show they really capture the data patterns better than others
-- Plots provided below show that some models get quite good predictions
+- Plots provided below show that some models performs well on visualized predictions even though their mean error shows otherwise (they might be penalized for their mistakes more than a model which predicts only Expected value of log return ~0)
 - All models beat Naive model 
 
 
@@ -101,11 +101,13 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 - Weighted recall and precision indicate models have limited ability to correctly identify all positive cases and avoid false positives
 - Log Loss metric indicates models have limited confidence in their predictions
 - On ROC AUC metric, models show relatively weak ability to differentiate between classes across different thresholds
+- These models perform quite well on clasification prediction task given hard predictability of short horizon log return
 
 
-### Short-term stock returns exhibit very low predictability. All tested models achieved only marginal improvements over randomness, which is consistent with the known difficulty of short-horizon financial forecasting. Moreover, sentiment extracted from tweets does not provide strong predictive power in these settings.
+### Short-term stock returns exhibit very low predictability. All tested models achieved only marginal improvements over basic mean of y or randomness, which is consistent with the known difficulty of short-horizon financial forecasting. Moreover, sentiment extracted from tweets does not provide strong predictive power in these settings.
 - **Though regression models perform quite well on visualizations, metrics show they aren't really reliable**   
-- **There aren't any significant patterns/relationships in this data finded, which when modeled with these models, could be reliably used to predict log return, or rise/other binary variable of TSLA. All classificator models shows accuracy slightly above 0.50 and regressor models show similar MSE to basic ARIMA of low order, which also by plot show weak oscilation around mean (~0) of the log return timeseries.**   
+- **All models combined (classification and regression) show that in these settings, they are better in predicting the direction of future log return than the size of its change**
+- **There aren't any sufficient significant patterns/relationships in this data finded, which when modeled with these models, could be reliably used to predict log return of TSLA. Regressor models show similar MSE to basic ARIMA of low order, which also by plot show weak oscilation around mean (~0) of the log return timeseries.**   
 
 
 - **NOTE**:  
