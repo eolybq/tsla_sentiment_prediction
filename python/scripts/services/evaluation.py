@@ -10,8 +10,6 @@ import lightgbm as lgb
 import graphviz
 
 
-# TODO plotovat jen used features nebo proste n nejvice important features u RF, XGBoost a LightGBM
-
 
 custom_colors = {
     'y_pred': '#1717c1',
@@ -19,6 +17,8 @@ custom_colors = {
     'Actual': '#4D4D4D',
     'Predicted': '#1717c1'
 }
+
+k_importances = 25
 
 
 def evaluate_class(y_test, y_pred_class, y_pred_proba, model_name, model=None, features_names=None):
@@ -38,7 +38,7 @@ def evaluate_class(y_test, y_pred_class, y_pred_proba, model_name, model=None, f
             # jen použité feature
             model_importances_used = model_importances[model_importances > 0].sort_values(ascending=False)
 
-            model_importances_used.plot(kind='bar', figsize=(10, 10))
+            model_importances_used.plot(kind='bar', figsize=(20, 10))
             plt.title(f"{model_name} Feature Importances")
             plt.ylabel("Importance")
             plt.xlabel("Feature")
@@ -58,8 +58,9 @@ def evaluate_class(y_test, y_pred_class, y_pred_proba, model_name, model=None, f
             model_importances = pd.Series(model.feature_importances_, index=features_names)
             # jen použité feature
             model_importances_used = model_importances[model_importances > 0].sort_values(ascending=False)
+            top_k_importances_used = model_importances_used.iloc[:k_importances]
 
-            model_importances_used.plot(kind='bar', figsize=(10, 10))
+            top_k_importances_used.plot(kind='bar', figsize=(20, 10))
             plt.title(f"{model_name} Feature Importances")
             plt.ylabel("Importance")
             plt.xlabel("Feature")
@@ -70,11 +71,11 @@ def evaluate_class(y_test, y_pred_class, y_pred_proba, model_name, model=None, f
             graph.render(f"python/plots_tabs/{model_name}_first_tree.png")
             graph.view()
 
-            plot_importance(model, importance_type='gain')
+            plot_importance(model, importance_type='gain', max_num_features=k_importances)
             plt.title(f"{model_name} Feature Importance (gain)")
             plt.show()
 
-            plot_importance(model, importance_type='weight')
+            plot_importance(model, importance_type='weight', max_num_features=k_importances)
             plt.title(f"{model_name} Feature Importance (weight)")
             plt.show()
 
@@ -89,8 +90,9 @@ def evaluate_class(y_test, y_pred_class, y_pred_proba, model_name, model=None, f
 
             # jen použité feature
             model_importances_used = model_importances[model_importances > 0].sort_values(ascending=False)
+            top_k_importances_used = model_importances_used.iloc[:k_importances]
 
-            model_importances_used.plot(kind='bar', figsize=(10, 10))
+            top_k_importances_used.plot(kind='bar', figsize=(20, 10))
             plt.title(f"{model_name} Feature Importances")
             plt.ylabel("Importance")
             plt.xlabel("Feature")
@@ -165,7 +167,7 @@ def evaluate_regg(y_test, y_pred, model_name, model=None, features_names=None):
             # jen použité feature
             model_importances_used = model_importances[model_importances > 0].sort_values(ascending=False)
 
-            model_importances_used.plot(kind='bar', figsize=(10, 10))
+            model_importances_used.plot(kind='bar', figsize=(20, 10))
             plt.title(f"{model_name} Feature Importances")
             plt.ylabel("Importance")
             plt.xlabel("Feature")
@@ -184,8 +186,9 @@ def evaluate_regg(y_test, y_pred, model_name, model=None, features_names=None):
             model_importances = pd.Series(model.feature_importances_, index=features_names)
             # jen použité feature
             model_importances_used = model_importances[model_importances > 0].sort_values(ascending=False)
+            top_k_importances_used = model_importances_used.iloc[:k_importances]
 
-            model_importances_used.plot(kind='bar', figsize=(10, 10))
+            top_k_importances_used.plot(kind='bar', figsize=(20, 10))
             plt.title(f"{model_name} Feature Importances")
             plt.ylabel("Importance")
             plt.xlabel("Feature")
@@ -196,11 +199,11 @@ def evaluate_regg(y_test, y_pred, model_name, model=None, features_names=None):
             graph.render(f"python/plots_tabs/{model_name}_first_tree.png")
             graph.view()
 
-            plot_importance(model, importance_type='gain')
+            plot_importance(model, importance_type='gain', max_num_features=k_importances)
             plt.title(f"{model_name} Feature Importance (gain)")
             plt.show()
 
-            plot_importance(model, importance_type='weight')
+            plot_importance(model, importance_type='weight', max_num_features=k_importances)
             plt.title(f"{model_name} Feature Importance (weight)")
             plt.show()
 
@@ -215,8 +218,9 @@ def evaluate_regg(y_test, y_pred, model_name, model=None, features_names=None):
 
             # jen použité feature
             model_importances_used = model_importances[model_importances > 0].sort_values(ascending=False)
+            top_k_importances_used = model_importances_used.iloc[:k_importances]
 
-            model_importances_used.plot(kind='bar', figsize=(10, 10))
+            top_k_importances_used.plot(kind='bar', figsize=(20, 10))
             plt.title(f"{model_name} Feature Importances")
             plt.ylabel("Importance")
             plt.xlabel("Feature")
@@ -245,13 +249,30 @@ def evaluate_regg(y_test, y_pred, model_name, model=None, features_names=None):
     r2_test = 1 - sse_test / sst_test
     print(f"Test R^2: {r2_test:.4f}")
 
+
+    # Median errors and Directional Accuracy -> neni tolik ovlivneno velkymi chybami - outliers
+    mse_median = np.median((y_test - y_pred) ** 2)
+    mae_median = np.median(np.abs(y_test - y_pred))
+
+    delta_true = np.diff(y_test)
+    delta_pred = np.diff(y_pred)
+    d_accuracy = np.mean(np.sign(delta_true) == np.sign(delta_pred))
+
+    naive_mse_median = np.median((y_test[1:] - naive_pred) ** 2)
+    naive_mae_median = np.median(np.abs(y_test[1:] - naive_pred))
+
+
+
     metrics_df = pd.DataFrame({
         "Model": [model_name, "Naive"],
         "MSE": [test_mse, naive_mse],
         "RMSE": [test_rmse, naive_rmse],
         "MAE": [test_mae, naive_mae],
         "MASE": [test_mase, 1.0000],
-        "R^2": [r2_test, ""]
+        "R^2": [r2_test, ""],
+        "MSE_median": [mse_median, naive_mse_median],
+        "MAE_median": [mae_median, naive_mae_median],
+        "Dir_accuracy": [d_accuracy, ""],
     })
     metrics_df.to_excel(f"python/plots_tabs/{model_name}_metrics.xlsx", index=False)
 

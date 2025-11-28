@@ -138,38 +138,38 @@ evaluate_regg(y_test, lgbr_y_pred, model_name="LightGBMRegressor", model=loaded_
 
 
 
-
-# GD Logistic Regression
-print("---Gradient Descent Logistic Regression---")
-gd_logit_y_pred_proba = preds_df['GD LogisticRegression'].values
-gd_logit_best_thresh = find_optimal_threshold(y_clf_test, gd_logit_y_pred_proba)
-gd_logit_y_pred_class = (gd_logit_y_pred_proba >= gd_logit_best_thresh).astype(int)
-evaluate_class(y_clf_test, gd_logit_y_pred_class, gd_logit_y_pred_proba, model_name="GDLogisticRegression")
-
-# Decision Tree Classifier
-print("---Decision Tree Classifier---")
-dtc_y_pred_proba = preds_df['DecisionTreeClassifier'].values
-dtc_best_thresh = find_optimal_threshold(y_clf_test, dtc_y_pred_proba)
-dtc_y_pred_class = (dtc_y_pred_proba >= dtc_best_thresh).astype(int)
-evaluate_class(y_clf_test, dtc_y_pred_class, dtc_y_pred_proba, model_name="DecisionTreeClassifier", model=loaded_models["dtc"], features_names=features_names)
-
-# Random Forest Classifier
-print("---Random Forest Classifier---")
-rfc_y_pred_proba = preds_df['RandomForestClassifier'].values
-rfc_best_thresh = find_optimal_threshold(y_clf_test, rfc_y_pred_proba)
-rfc_y_pred_class = (rfc_y_pred_proba >= rfc_best_thresh).astype(int)
-evaluate_class(y_clf_test, rfc_y_pred_class, rfc_y_pred_proba, model_name="RandomForestClassifier", model=loaded_models["rfc"], features_names=features_names)
-
-# XGBoost Classifier
-print("---XGBoost Classifier---")
-xgbc_y_pred_proba = preds_df['XGBoostClassifier'].values
-xgbc_best_thresh = find_optimal_threshold(y_clf_test, xgbc_y_pred_proba)
-xgbc_y_pred_class = (xgbc_y_pred_proba >= xgbc_best_thresh).astype(int)
-evaluate_class(y_clf_test, xgbc_y_pred_class, xgbc_y_pred_proba, model_name="XGBoostClassifier", model=loaded_models["xgbc"], features_names=features_names)
-
-# LightGBM Classifier
-print("---LightGBM Classifier---")
-lgbc_y_pred_proba = preds_df['LightGBMClassifier'].values
-lgbc_best_thresh = find_optimal_threshold(y_clf_test, lgbc_y_pred_proba)
-lgbc_y_pred_class = (lgbc_y_pred_proba >= lgbc_best_thresh).astype(int)
-evaluate_class(y_clf_test, lgbc_y_pred_class, lgbc_y_pred_proba, model_name="LightGBMClassifier", model=loaded_models["lgbc"], features_names=features_names)
+#
+# # GD Logistic Regression
+# print("---Gradient Descent Logistic Regression---")
+# gd_logit_y_pred_proba = preds_df['GD LogisticRegression'].values
+# gd_logit_best_thresh = find_optimal_threshold(y_clf_test, gd_logit_y_pred_proba)
+# gd_logit_y_pred_class = (gd_logit_y_pred_proba >= gd_logit_best_thresh).astype(int)
+# evaluate_class(y_clf_test, gd_logit_y_pred_class, gd_logit_y_pred_proba, model_name="GDLogisticRegression")
+#
+# # Decision Tree Classifier
+# print("---Decision Tree Classifier---")
+# dtc_y_pred_proba = preds_df['DecisionTreeClassifier'].values
+# dtc_best_thresh = find_optimal_threshold(y_clf_test, dtc_y_pred_proba)
+# dtc_y_pred_class = (dtc_y_pred_proba >= dtc_best_thresh).astype(int)
+# evaluate_class(y_clf_test, dtc_y_pred_class, dtc_y_pred_proba, model_name="DecisionTreeClassifier", model=loaded_models["dtc"], features_names=features_names)
+#
+# # Random Forest Classifier
+# print("---Random Forest Classifier---")
+# rfc_y_pred_proba = preds_df['RandomForestClassifier'].values
+# rfc_best_thresh = find_optimal_threshold(y_clf_test, rfc_y_pred_proba)
+# rfc_y_pred_class = (rfc_y_pred_proba >= rfc_best_thresh).astype(int)
+# evaluate_class(y_clf_test, rfc_y_pred_class, rfc_y_pred_proba, model_name="RandomForestClassifier", model=loaded_models["rfc"], features_names=features_names)
+#
+# # XGBoost Classifier
+# print("---XGBoost Classifier---")
+# xgbc_y_pred_proba = preds_df['XGBoostClassifier'].values
+# xgbc_best_thresh = find_optimal_threshold(y_clf_test, xgbc_y_pred_proba)
+# xgbc_y_pred_class = (xgbc_y_pred_proba >= xgbc_best_thresh).astype(int)
+# evaluate_class(y_clf_test, xgbc_y_pred_class, xgbc_y_pred_proba, model_name="XGBoostClassifier", model=loaded_models["xgbc"], features_names=features_names)
+#
+# # LightGBM Classifier
+# print("---LightGBM Classifier---")
+# lgbc_y_pred_proba = preds_df['LightGBMClassifier'].values
+# lgbc_best_thresh = find_optimal_threshold(y_clf_test, lgbc_y_pred_proba)
+# lgbc_y_pred_class = (lgbc_y_pred_proba >= lgbc_best_thresh).astype(int)
+# evaluate_class(y_clf_test, lgbc_y_pred_class, lgbc_y_pred_proba, model_name="LightGBMClassifier", model=loaded_models["lgbc"], features_names=features_names)
