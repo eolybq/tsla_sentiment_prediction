@@ -1,18 +1,16 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, roc_curve
 import joblib
 import glob
-from tqdm import tqdm
+import os
 
-from models.linear_models import train_gd_lr, train_gd_logit
-from models.tree_models import train_dtr, train_dtc
-from models.forest_models import train_rfr, train_rfc
-from models.xgboost_models import train_xgbr, train_xgbc
-from models.lightgbm_models import train_lgbr, train_lgbc
+from python.scripts.services.walk_forward import walk_forward_test
+from python.scripts.services.evaluation import evaluate_class, evaluate_regg
 
 
-df = pd.read_csv('../cleandata/processed_data.csv')
+
+df = pd.read_csv('python/cleandata/processed_data.csv')
 
 # log return
 df["log_return"] = np.log(df['adjusted'] / df['adjusted'].shift(1))
@@ -60,114 +58,118 @@ y, y_clf = y[lags:], y_clf[lags:]
 # X, y, y_clf = np.array(X), np.array(y), np.array(y_clf)
 
 
-learning_rate = 0.01
-epochs = 10_000
+gd_learning_rate = 0.01
+gd_epochs = 10_000
 
 
 window = 2630
 
-preds_df = pd.DataFrame(
-    np.nan,
-    index=range(window, len(X)),
-    columns = [
-        'GD LinearRegression',
-        'DecisionTreeRegressor',
-        'RandomForestRegressor',
-        'XGBoostRegressor',
-        'LightGBMRegressor',
-        'GD LogisticRegression',
-        'DecisionTreeClassifier',
-        'RandomForestClassifier',
-        'XGBoostClassifier',
-        'LightGBMClassifier'
-    ]
-)
-
-preds_df.to_csv("../trained_models/predictions.csv", index=True)
 
 # -----Main walk forward loop-----
-for i in tqdm(range(window, len(X)), desc="Training"):
-    start = i - window
-
-    X_train = X.iloc[start:i, ]
-    y_train = y.iloc[start:i]
-    y_clf_train = y_clf.iloc[start:i]
-
-    # X_test = (X[i]).reshape(1, -1)
-    X_test = X.iloc[[i], :]
-
-
-    # GD Models
-    gd_lr_y_pred = train_gd_lr(X_train, X_test, y_train, learning_rate, epochs)
-    preds_df.loc[i, 'GD LinearRegression'] = gd_lr_y_pred
-
-    gd_logit_y_pred_proba = train_gd_logit(X_train, X_test, y_clf_train, learning_rate, epochs)
-    preds_df.loc[i, 'GD LogisticRegression'] = gd_logit_y_pred_proba
-
-
-    save_model_flag = (i == len(X) - 1)
-
-    # Decision Trees
-    dtr_y_pred = train_dtr(X_train, X_test, y_train, max_depth=5, save=save_model_flag)
-    preds_df.loc[i, 'DecisionTreeRegressor'] = dtr_y_pred
-
-    dtc_y_pred_proba = train_dtc(X_train, X_test, y_clf_train, max_depth=5, save=save_model_flag)
-    preds_df.loc[i, 'DecisionTreeClassifier'] = dtc_y_pred_proba
-
-
-    # Random Forests
-    rfr_y_pred = train_rfr(X_train, X_test, y_train, n_estimators=500, max_depth=5, save=save_model_flag)
-    preds_df.loc[i, 'RandomForestRegressor'] = rfr_y_pred
-
-    rfc_y_pred_proba = train_rfc(X_train, X_test, y_clf_train, n_estimators=500, max_depth=5, save=save_model_flag)
-    preds_df.loc[i, 'RandomForestClassifier'] = rfc_y_pred_proba
-
-
-    # XGBoosts
-    xgbr_y_pred = train_xgbr(X_train, X_test, y_train, n_estimators=500, max_depth=5, save=save_model_flag)
-    preds_df.loc[i, 'XGBoostRegressor'] = xgbr_y_pred
-
-    xgbc_y_pred_proba = train_xgbc(X_train, X_test, y_clf_train, n_estimators=500, max_depth=5, save=save_model_flag)
-    preds_df.loc[i, 'XGBoostClassifier'] = xgbc_y_pred_proba
-
-
-    # LightGBMs
-    lgbr_y_pred = train_lgbr(X_train, X_test, y_train, n_estimators=500, max_depth=5, save=save_model_flag)
-    preds_df.loc[i, 'LightGBMRegressor'] = lgbr_y_pred
-
-    lgbc_y_pred_proba = train_lgbc(X_train, X_test, y_clf_train, n_estimators=500, max_depth=5, save=save_model_flag)
-    preds_df.loc[i, 'LightGBMClassifier'] = lgbc_y_pred_proba
-
-
-    # prubezne ukladnani predikci
-    preds_df.to_csv("../trained_models/predictions.csv", index=True)
-
-
+# walk_forward_test(
+#     X,
+#     y,
+#     y_clf,
+#     window,
+#     gd_learning_rate,
+#     gd_epochs,
+# )
 
 
 # LOAD TRAINED MODELS AND PREDICTIONS:
 loaded_models = {}
-files = glob.glob("*.pkl")
+files = glob.glob("python/trained_models/*.pkl")
+
 
 for f in files:
-    model_name = f.split(".pkl")[0].split("_")[0]
+    base = os.path.basename(f)
+    model_name = base.split("_")[0]
     loaded_models[model_name] = joblib.load(f)
 
-preds_df = pd.read_csv("../trained_models/predictions.csv", index_col=0)
+preds_df = pd.read_csv("python/trained_models/predictions.csv", index_col=0)
 
 
 
 # -----Evaluate-----
-# TODO
-y_test = y[window:]
+print("-----EVALUATION RESULTS-----")
+# Posilat model name nejak aby hezky v grafu ale zaroven aby se daly soubory ulozit hezky
+
+y_test = np.array(y[window:])
 y_clf_test = y_clf[window:]
 
 
 # Threshold maximalizujici F1
-thresholds = np.linspace(0, 1, 101)
-f1_scores = [f1_score(y_clf_test, y_pred_proba > t) for t in thresholds]
-best_thresh = thresholds[np.argmax(f1_scores)]
-print("Optimal threshold:", best_thresh)
+def find_optimal_threshold(y_true, y_proba):
+    thresholds = np.linspace(0, 1, 101)
+    f1_scores = [f1_score(y_true, y_proba > t, average='weighted') for t in thresholds]
+    best_thresh = thresholds[np.argmax(f1_scores)]
+
+    # fpr, tpr, thresholds = roc_curve(y_true, y_proba)
+    # j_scores = tpr - fpr
+    # best_thresh = thresholds[np.argmax(j_scores)]
+
+    return best_thresh
 
 
-clf_pred_threshold = 0.5
+# GD Linear Regression
+print("---Gradient Descent Linear Regression---")
+gd_lr_y_pred = preds_df['GD LinearRegression'].values
+evaluate_regg(y_test, gd_lr_y_pred, model_name="GDLinearRegression")
+
+# Decision Tree Reggressor
+print("---Decision Tree Regressor---")
+dtc_y_pred = preds_df['DecisionTreeRegressor'].values
+evaluate_regg(y_test, dtc_y_pred, model_name="DecisionTreeRegressor", model=loaded_models["dtr"], features_names=features_names)
+
+# Random Forest Reggressor
+print("---Random Forest Regressor---")
+rfr_y_pred = preds_df['RandomForestRegressor'].values
+evaluate_regg(y_test, rfr_y_pred, model_name="RandomForestRegressor", model=loaded_models["rfr"], features_names=features_names)
+
+# XGBoost Reggressor
+print("---XGBoost Regressor---")
+xgbr_y_pred = preds_df['XGBoostRegressor'].values
+evaluate_regg(y_test, xgbr_y_pred, model_name="XGBoostRegressor", model=loaded_models["xgbr"], features_names=features_names)
+
+# LightGBM Reggressor
+print("---LightGBM Regressor---")
+lgbr_y_pred = preds_df['LightGBMRegressor'].values
+evaluate_regg(y_test, lgbr_y_pred, model_name="LightGBMRegressor", model=loaded_models["lgbr"], features_names=features_names)
+
+
+
+
+# GD Logistic Regression
+print("---Gradient Descent Logistic Regression---")
+gd_logit_y_pred_proba = preds_df['GD LogisticRegression'].values
+gd_logit_best_thresh = find_optimal_threshold(y_clf_test, gd_logit_y_pred_proba)
+gd_logit_y_pred_class = (gd_logit_y_pred_proba >= gd_logit_best_thresh).astype(int)
+evaluate_class(y_clf_test, gd_logit_y_pred_class, gd_logit_y_pred_proba, model_name="GDLogisticRegression")
+
+# Decision Tree Classifier
+print("---Decision Tree Classifier---")
+dtc_y_pred_proba = preds_df['DecisionTreeClassifier'].values
+dtc_best_thresh = find_optimal_threshold(y_clf_test, dtc_y_pred_proba)
+dtc_y_pred_class = (dtc_y_pred_proba >= dtc_best_thresh).astype(int)
+evaluate_class(y_clf_test, dtc_y_pred_class, dtc_y_pred_proba, model_name="DecisionTreeClassifier", model=loaded_models["dtc"], features_names=features_names)
+
+# Random Forest Classifier
+print("---Random Forest Classifier---")
+rfc_y_pred_proba = preds_df['RandomForestClassifier'].values
+rfc_best_thresh = find_optimal_threshold(y_clf_test, rfc_y_pred_proba)
+rfc_y_pred_class = (rfc_y_pred_proba >= rfc_best_thresh).astype(int)
+evaluate_class(y_clf_test, rfc_y_pred_class, rfc_y_pred_proba, model_name="RandomForestClassifier", model=loaded_models["rfc"], features_names=features_names)
+
+# XGBoost Classifier
+print("---XGBoost Classifier---")
+xgbc_y_pred_proba = preds_df['XGBoostClassifier'].values
+xgbc_best_thresh = find_optimal_threshold(y_clf_test, xgbc_y_pred_proba)
+xgbc_y_pred_class = (xgbc_y_pred_proba >= xgbc_best_thresh).astype(int)
+evaluate_class(y_clf_test, xgbc_y_pred_class, xgbc_y_pred_proba, model_name="XGBoostClassifier", model=loaded_models["xgbc"], features_names=features_names)
+
+# LightGBM Classifier
+print("---LightGBM Classifier---")
+lgbc_y_pred_proba = preds_df['LightGBMClassifier'].values
+lgbc_best_thresh = find_optimal_threshold(y_clf_test, lgbc_y_pred_proba)
+lgbc_y_pred_class = (lgbc_y_pred_proba >= lgbc_best_thresh).astype(int)
+evaluate_class(y_clf_test, lgbc_y_pred_class, lgbc_y_pred_proba, model_name="LightGBMClassifier", model=loaded_models["lgbc"], features_names=features_names)

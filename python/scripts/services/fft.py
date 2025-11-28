@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-df = pd.read_csv('../../cleandata/processed_data.csv')
+df = pd.read_csv('python/cleandata/processed_data.csv')
 x = df['adjusted'].values
 
 # Fourierova transformace

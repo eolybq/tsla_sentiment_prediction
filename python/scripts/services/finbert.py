@@ -2,8 +2,8 @@ import pandas as pd
 from transformers import pipeline, AutoTokenizer
 from tqdm import tqdm
 
-df = pd.read_csv("../../../data/rawdata/tweets_tsla_daily.csv")
-df_not_agr = pd.read_csv("../../../data/rawdata/tweets_tsla_not_agregated.csv")
+df = pd.read_csv("data/rawdata/tweets_tsla_daily.csv")
+df_not_agr = pd.read_csv("/data/rawdata/tweets_tsla_not_agregated.csv")
 
 tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
 pipe = pipeline("text-classification", model="ProsusAI/finbert", tokenizer=tokenizer, top_k = None)
@@ -38,5 +38,5 @@ df_not_agr["sentiment_neutral"] = sentiments_not_agr.apply(lambda x: x["neutral"
 df_not_agr["sentiment_negative"] = sentiments_not_agr.apply(lambda x: x["negative"])
 
 
-df.to_csv("../../data/rawdata/tweets_tsla_daily_sentiment.csv", index=False)
-df_not_agr.to_csv("../../data/rawdata/tweets_tsla_not_agregated_sentiment.csv", index=False)
+df.to_csv("data/rawdata/tweets_tsla_daily_sentiment.csv", index=False)
+df_not_agr.to_csv("data/rawdata/tweets_tsla_not_agregated_sentiment.csv", index=False)

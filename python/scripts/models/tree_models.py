@@ -18,7 +18,7 @@ def train_dtr(X_train, X_test, y_train, crit='squared_error', save=False, max_de
     y_pred = np.array(y_pred)
 
     if save:
-        joblib.dump(dtr, "../trained_models/dtr_last.pkl")
+        joblib.dump(dtr, "python/trained_models/dtr_last.pkl")
 
     print("-----FINISHED Decision Tree Regressor-----")
 
@@ -35,7 +35,7 @@ def train_dtc(X_train, X_test, y_train, crit='gini', save=False, max_depth=5):
     y_pred_proba = dtc.predict_proba(X_test)[:, 1]
 
     if save:
-        joblib.dump(dtc, "../trained_models/dtc_last.pkl")
+        joblib.dump(dtc, "python/trained_models/dtc_last.pkl")
 
     print("-----FINISHED Decision Tree Classifier-----")
 

@@ -1,0 +1,143 @@
+digraph {
+    graph [ rankdir=TB ]
+
+    0 [ label="macd_lag9<-9.31538773" ]
+    0 -> 1 [label="yes" color="#FF0000"]
+    0 -> 2 [label="no, missing" color="#0000FF"]
+
+    1 [ label="volume_lag6<303634496" ]
+    1 -> 3 [label="yes" color="#FF0000"]
+    1 -> 4 [label="no, missing" color="#0000FF"]
+
+    3 [ label="sentiment_neutral_lag3<1" ]
+    3 -> 7 [label="yes" color="#FF0000"]
+    3 -> 8 [label="no, missing" color="#0000FF"]
+
+    7 [ label="rsi_lag8<30.7352085" ]
+    7 -> 13 [label="yes" color="#FF0000"]
+    7 -> 14 [label="no, missing" color="#0000FF"]
+
+    13 [ label="log_return_lag4<0.0111947777" ]
+    13 -> 25 [label="yes" color="#FF0000"]
+    13 -> 26 [label="no, missing" color="#0000FF"]
+
+    25 [ label="leaf=0.00401127106" ]
+
+    26 [ label="leaf=-0.000347639638" ]
+
+    14 [ label="volume_lag10<254791808" ]
+    14 -> 27 [label="yes" color="#FF0000"]
+    14 -> 28 [label="no, missing" color="#0000FF"]
+
+    27 [ label="leaf=0.00842442829" ]
+
+    28 [ label="leaf=0.00343954912" ]
+
+    8 [ label="log_return_lag8<0.0481403768" ]
+    8 -> 15 [label="yes" color="#FF0000"]
+    8 -> 16 [label="no, missing" color="#0000FF"]
+
+    15 [ label="volume_lag8<216455696" ]
+    15 -> 29 [label="yes" color="#FF0000"]
+    15 -> 30 [label="no, missing" color="#0000FF"]
+
+    29 [ label="leaf=0.000182196949" ]
+
+    30 [ label="leaf=-0.000746812148" ]
+
+    16 [ label="log_return_lag1<-0.0124500012" ]
+    16 -> 31 [label="yes" color="#FF0000"]
+    16 -> 32 [label="no, missing" color="#0000FF"]
+
+    31 [ label="leaf=0.00335132494" ]
+
+    32 [ label="leaf=0.000567052979" ]
+
+    4 [ label="leaf=-0.0048157461" ]
+
+    2 [ label="basic_volatility_lag9<27.3599854" ]
+    2 -> 5 [label="yes" color="#FF0000"]
+    2 -> 6 [label="no, missing" color="#0000FF"]
+
+    5 [ label="log_return_lag1<-0.102540366" ]
+    5 -> 9 [label="yes" color="#FF0000"]
+    5 -> 10 [label="no, missing" color="#0000FF"]
+
+    9 [ label="log_return_lag9<-0.0265030004" ]
+    9 -> 17 [label="yes" color="#FF0000"]
+    9 -> 18 [label="no, missing" color="#0000FF"]
+
+    17 [ label="log_return_lag2<-0.00659579691" ]
+    17 -> 33 [label="yes" color="#FF0000"]
+    17 -> 34 [label="no, missing" color="#0000FF"]
+
+    33 [ label="leaf=0.00932082627" ]
+
+    34 [ label="leaf=0.00170129631" ]
+
+    18 [ label="basic_volatility_lag1<4.72000122" ]
+    18 -> 35 [label="yes" color="#FF0000"]
+    18 -> 36 [label="no, missing" color="#0000FF"]
+
+    35 [ label="leaf=-0.00158835936" ]
+
+    36 [ label="leaf=0.00283075985" ]
+
+    10 [ label="log_return_lag3<0.0971019492" ]
+    10 -> 19 [label="yes" color="#FF0000"]
+    10 -> 20 [label="no, missing" color="#0000FF"]
+
+    19 [ label="vix_lag2<45.4099998" ]
+    19 -> 37 [label="yes" color="#FF0000"]
+    19 -> 38 [label="no, missing" color="#0000FF"]
+
+    37 [ label="leaf=-3.81487225e-05" ]
+
+    38 [ label="leaf=-0.00483931089" ]
+
+    20 [ label="log_return_lag1<-0.0179093145" ]
+    20 -> 39 [label="yes" color="#FF0000"]
+    20 -> 40 [label="no, missing" color="#0000FF"]
+
+    39 [ label="leaf=-0.00200957665" ]
+
+    40 [ label="leaf=0.00438194489" ]
+
+    6 [ label="log_return_lag9<-0.0651105195" ]
+    6 -> 11 [label="yes" color="#FF0000"]
+    6 -> 12 [label="no, missing" color="#0000FF"]
+
+    11 [ label="volume_lag1<65118000" ]
+    11 -> 21 [label="yes" color="#FF0000"]
+    11 -> 22 [label="no, missing" color="#0000FF"]
+
+    21 [ label="leaf=0.000864901289" ]
+
+    22 [ label="volume_lag3<78891104" ]
+    22 -> 41 [label="yes" color="#FF0000"]
+    22 -> 42 [label="no, missing" color="#0000FF"]
+
+    41 [ label="leaf=-0.00263206731" ]
+
+    42 [ label="leaf=-0.0091911843" ]
+
+    12 [ label="basic_volatility_lag9<31.6400146" ]
+    12 -> 23 [label="yes" color="#FF0000"]
+    12 -> 24 [label="no, missing" color="#0000FF"]
+
+    23 [ label="log_return_lag5<0.0305549037" ]
+    23 -> 43 [label="yes" color="#FF0000"]
+    23 -> 44 [label="no, missing" color="#0000FF"]
+
+    43 [ label="leaf=-0.000457471295" ]
+
+    44 [ label="leaf=-0.00395668671" ]
+
+    24 [ label="vix_lag1<15.4700003" ]
+    24 -> 45 [label="yes" color="#FF0000"]
+    24 -> 46 [label="no, missing" color="#0000FF"]
+
+    45 [ label="leaf=-0.000371738046" ]
+
+    46 [ label="leaf=0.00388358091" ]
+}

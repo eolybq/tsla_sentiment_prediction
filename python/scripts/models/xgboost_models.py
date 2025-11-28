@@ -22,7 +22,7 @@ def train_xgbr(X_train, X_test, y_train, obj='reg:squarederror', save=False, n_e
     y_pred = np.array(y_pred)
 
     if save:
-        joblib.dump(xgbr, "../trained_models/xgbr_last.pkl")
+        joblib.dump(xgbr, "python/trained_models/xgbr_last.pkl")
 
     print("-----FINISHED XGBoost Regressor-----")
 
@@ -40,7 +40,7 @@ def train_xgbc(X_train, X_test, y_train, obj='binary:logistic', l_rate=0.1, save
     y_pred_proba = xgbc.predict_proba(X_test)[:, 1]
 
     if save:
-        joblib.dump(xgbc, "../trained_models/xgbc_last.pkl")
+        joblib.dump(xgbc, "python/trained_models/xgbc_last.pkl")
 
     print("-----FINISHED XGBoost Classifier-----")
 

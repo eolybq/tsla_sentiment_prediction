@@ -24,7 +24,7 @@ def train_lgbr(X_train, X_test, y_train, save=False, n_estimators=500, max_depth
     y_pred = np.array(y_pred)
 
     if save:
-        joblib.dump(lgbr, "../trained_models/lgbr_last.pkl")
+        joblib.dump(lgbr, "python/trained_models/lgbr_last.pkl")
 
     print("-----FINISHED LightGBM Regressor-----")
 
@@ -42,7 +42,7 @@ def train_lgbc(X_train, X_test, y_train, save=False, n_estimators=500, max_depth
     y_pred_proba = lgbc.predict_proba(X_test)[:, 1]
 
     if save:
-        joblib.dump(lgbc, "../trained_models/lgbc_last.pkl")
+        joblib.dump(lgbc, "python/trained_models/lgbc_last.pkl")
 
     print("-----FINISHED LightGBM Classifier-----")
 

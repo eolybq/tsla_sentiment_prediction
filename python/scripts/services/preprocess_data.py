@@ -3,13 +3,13 @@ from pandas.tseries.offsets import MonthEnd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
-indicator_data = pd.read_csv('../../cleandata/individual_data/indicator_data.csv')
-tesla_trends = pd.read_csv('../../cleandata/individual_data/tesla_trends.csv')
-daily_tesla_trends = pd.read_csv('../../cleandata/individual_data/daily_tesla_trends_data.csv')
-sent_surv_clean = pd.read_csv('../../cleandata/individual_data/sent_surv_clean.csv')
-sentiment_daily = pd.read_csv('../../cleandata/individual_data/sentiment_daily.csv')
-sentiment_not_agr = pd.read_csv('../../cleandata/individual_data/sentiment_not_agr.csv')
-vix = pd.read_csv('../../cleandata/individual_data/vix_data.csv')
+indicator_data = pd.read_csv('python/cleandata/individual_data/indicator_data.csv')
+tesla_trends = pd.read_csv('python/cleandata/individual_data/tesla_trends.csv')
+daily_tesla_trends = pd.read_csv('python/cleandata/individual_data/daily_tesla_trends_data.csv')
+sent_surv_clean = pd.read_csv('python/cleandata/individual_data/sent_surv_clean.csv')
+sentiment_daily = pd.read_csv('python/cleandata/individual_data/sentiment_daily.csv')
+sentiment_not_agr = pd.read_csv('python/cleandata/individual_data/sentiment_not_agr.csv')
+vix = pd.read_csv('python/cleandata/individual_data/vix_data.csv')
 
 
 # Ocisteni pouze sledovanych sloupcu
@@ -80,4 +80,4 @@ data = data[
 
 data = data.dropna()
 
-data.to_csv('../cleandata/processed_data.csv', index=False)
+data.to_csv('python/cleandata/processed_data.csv', index=False)

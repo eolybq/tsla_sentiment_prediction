@@ -18,7 +18,7 @@ def train_rfr(X_train, X_test, y_train, crit='squared_error', save=False, n_esti
     y_pred = np.array(y_pred)
 
     if save:
-        joblib.dump(rfr, "../trained_models/rfr_last.pkl")
+        joblib.dump(rfr, "python/trained_models/rfr_last.pkl")
 
     print("-----FINISHED Random Forest Regressor-----")
 
@@ -36,7 +36,7 @@ def train_rfc(X_train, X_test, y_train, crit='gini', save=False, n_estimators=50
     y_pred_proba = rfc.predict_proba(X_test)[:, 1]
 
     if save:
-        joblib.dump(rfc, "../trained_models/rfc_last.pkl")
+        joblib.dump(rfc, "python/trained_models/rfc_last.pkl")
 
     print("-----FINISHED Random Forest Classifier-----")
 
