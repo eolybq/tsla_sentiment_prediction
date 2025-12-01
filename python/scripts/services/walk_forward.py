@@ -89,6 +89,6 @@ def walk_forward_test(
         lgbc_y_pred_proba = train_lgbc(X_train, X_test, y_clf_train, n_estimators=500, max_depth=5, save=save_model_flag)
         preds_df.loc[i, 'LightGBMClassifier'] = lgbc_y_pred_proba
 
-
-        # prubezne ukladnani predikci
-        preds_df.to_csv("python/trained_models/predictions.csv", index=True)
+        if i % 50 == 0 or i == len(X) - 1:
+            # prubezne ukladnani predikci
+            preds_df.to_csv("python/trained_models/predictions.csv", index=True)
