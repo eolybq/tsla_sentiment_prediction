@@ -17,6 +17,20 @@ df["log_return"] = np.log(df['adjusted'] / df['adjusted'].shift(1))
 df.dropna(inplace=True)
 
 
+# DYNAMICKY PARAMETR TIMEFRAME
+# TODO
+# nastavit parametr při volání timeframe
+# predikce ukládat s označením timeframe
+# vytvářet rolling jen pri timeframe > 1 shift u log return taky
+
+# AGREGACE FEATURES NA 5 DENNI TIMEFRAME - rolling
+# TODO
+# https://chatgpt.com/share/692de068-8030-8000-83ae-cba5550092d3
+
+# regularizace L1 / L2 u linear models
+# mensi learning rate, max depth u tree models - hlavne XGBOOST, LightGBM
+# TODO
+
 
 
 features = [
