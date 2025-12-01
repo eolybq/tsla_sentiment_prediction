@@ -6,6 +6,7 @@ from python.scripts.models import train_gd_lr, train_gd_logit, train_dtr, train_
 
 def walk_forward_test(
     X,
+    X_linear,
     y,
     y_clf,
     window,
@@ -37,18 +38,21 @@ def walk_forward_test(
         start = i - window
 
         X_train = X.iloc[start:i, ]
+        X_train_linear = X_linear.iloc[start:i, ]
+
         y_train = y.iloc[start:i]
         y_clf_train = y_clf.iloc[start:i]
 
         # X_test = (X[i]).reshape(1, -1)
         X_test = X.iloc[[i], :]
+        X_test_linear = X_linear.iloc[[i], :]
 
 
         # GD Models
-        gd_lr_y_pred = train_gd_lr(X_train, X_test, y_train, gd_learning_rate, gd_epochs)
+        gd_lr_y_pred = train_gd_lr(X_train_linear, X_test_linear, y_train, gd_learning_rate, gd_epochs)
         preds_df.loc[i, 'GD LinearRegression'] = gd_lr_y_pred
 
-        gd_logit_y_pred_proba = train_gd_logit(X_train, X_test, y_clf_train, gd_learning_rate, gd_epochs)
+        gd_logit_y_pred_proba = train_gd_logit(X_train_linear, X_test_linear, y_clf_train, gd_learning_rate, gd_epochs)
         preds_df.loc[i, 'GD LogisticRegression'] = gd_logit_y_pred_proba
 
 

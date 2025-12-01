@@ -17,7 +17,7 @@ df["log_return"] = np.log(df['adjusted'] / df['adjusted'].shift(1))
 df.dropna(inplace=True)
 
 
-# PCA?
+
 
 features = [
     # Unused
@@ -28,17 +28,17 @@ features = [
     'obv', 'rsi', 'adx'
 ]
 
+
 features_lin_models = features.copy()
 features_lin_models.remove("sentiment_none")
 
 
-
 # vytvoreni umele sekvence lagu -> kazdy radek obsahuje Pocet f * Pocet lags
-def create_lags(lags):
+def create_lags(lags, all_features):
     X = pd.DataFrame()
 
     for l in range(1, lags + 1):
-        for col in features:
+        for col in all_features:
             X[col + f'_lag{l}'] = df[col].shift(l)
 
     X.dropna(inplace=True)
@@ -46,7 +46,8 @@ def create_lags(lags):
 
 lags = 10
 
-X = create_lags(lags)
+X = create_lags(lags, features)
+X_linear = create_lags(lags, features_lin_models)
 features_names = X.columns
 
 y = df["log_return"]
@@ -68,6 +69,7 @@ window = 2630
 # -----Main walk forward loop-----
 # walk_forward_test(
 #     X,
+#     X_linear,
 #     y,
 #     y_clf,
 #     window,
