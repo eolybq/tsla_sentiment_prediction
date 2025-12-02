@@ -98,7 +98,7 @@ This project also introduces unusual data - sentiment indicator derived from Elo
 | DecisionTreeClassifier   | 0.52408     | 0.91675     | 0.51313     | 0.52002              | 0.52408           | 0.52164             |
 
 - Models show accuracy slightly better than randomness (0.5) although **GD Logistic Regression** performs quite good on all metrics
-- Weighted recall and precision indicate models have limited ability to correctly identify all positive cases and avoid false positives
+- Weighted recall and precision indicate models have in weighted average limited ability to correctly identify all actual classes and when they predict some class, they are only moderately often correct
 - Log Loss metric indicates models have limited confidence in their predictions
 - On ROC AUC metric, models show relatively weak ability to differentiate between classes across different thresholds
 - These models perform quite well on clasification prediction task given hard predictability of short horizon log return
