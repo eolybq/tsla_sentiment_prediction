@@ -37,7 +37,7 @@ features = [
     'bull_bear_spread_surv',
     'volume',
     'ema_20',
-    'basic_volatility', 'atr','macd', 'obv', 'rsi', 'adx'
+    'basic_volatility', 'atr','macd', 'obv', 'rsi', 'adx',
     'sentiment_neutral', 'sentiment_positive', 'sentiment_negative', 'sentiment_none',
 ]
 features_lin_models = features.copy()
