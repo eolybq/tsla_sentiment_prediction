@@ -5,6 +5,7 @@ from tqdm import tqdm
 from python.scripts.models import train_gd_lr, train_gd_logit, train_dtr, train_dtc, train_rfr, train_rfc, train_xgbr, train_xgbc, train_lgbr, train_lgbc
 
 def walk_forward_test(
+    timeframe,
     X,
     X_linear,
     y,
@@ -31,7 +32,7 @@ def walk_forward_test(
         ]
     )
 
-    preds_df.to_csv("python/trained_models/predictions.csv", index=True)
+    preds_df.to_csv(f"python/trained_models/predictions_{timeframe}d.csv", index=True)
 
     # -----Main walk forward loop-----
     for i in tqdm(range(window, len(X)), desc="Training"):
@@ -91,4 +92,4 @@ def walk_forward_test(
 
         if i % 50 == 0 or i == len(X) - 1:
             # prubezne ukladnani predikci
-            preds_df.to_csv("python/trained_models/predictions.csv", index=True)
+            preds_df.to_csv(f"python/trained_models/predictions_{timeframe}d.csv", index=True)

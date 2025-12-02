@@ -9,29 +9,26 @@ from python.scripts.services.walk_forward import walk_forward_test
 from python.scripts.services.evaluation import evaluate_class, evaluate_regg
 
 
+# regularizace L1 / L2 u linear models
+# mensi learning rate, max depth, min_samples_leaf, subsample u tree models - hlavne XGBOOST, LightGBM
+# TODO
+
+# MOZNA PROSTE NEJAK ZKUSIT JESTE TY ROLLING AGREGACE NA FEATURES
+# TODO
+
+
 
 df = pd.read_csv('python/cleandata/processed_data.csv')
 
-# log return
-df["log_return"] = np.log(df['adjusted'] / df['adjusted'].shift(1))
-df.dropna(inplace=True)
 
-
-# DYNAMICKY PARAMETR TIMEFRAME
-# TODO
-# nastavit parametr při volání timeframe
-# predikce ukládat s označením timeframe
-# vytvářet rolling jen pri timeframe > 1 shift u log return taky
-
-# AGREGACE FEATURES NA 5 DENNI TIMEFRAME - rolling
-# TODO
-# https://chatgpt.com/share/692de068-8030-8000-83ae-cba5550092d3
-
-# regularizace L1 / L2 u linear models
-# mensi learning rate, max depth u tree models - hlavne XGBOOST, LightGBM
-# TODO
-
-
+# TIMEFRAME PRO VYPOCET LOG RETURN
+timeframe = 5
+"""
+ = 1 → denní return
+ = 5 → týdenní return
+ = 20 → měsíční return
+ = 60 → kvartální return
+"""
 
 features = [
     # Unused
@@ -41,14 +38,16 @@ features = [
     'bull_bear_spread_surv', 'volume', 'ema_20', 'basic_volatility', 'atr', 'macd',
     'obv', 'rsi', 'adx'
 ]
-
-
 features_lin_models = features.copy()
-features_lin_models.remove("sentiment_none")
+features_lin_models.remove('sentiment_none')
+
+# log return
+df["log_return"] = np.log(df['adjusted'] / df['adjusted'].shift(timeframe))
+df.dropna(inplace=True)
 
 
 # vytvoreni umele sekvence lagu -> kazdy radek obsahuje Pocet f * Pocet lags
-def create_lags(lags, all_features):
+def create_lags(lags, all_features, df):
     X = pd.DataFrame()
 
     for l in range(1, lags + 1):
@@ -60,13 +59,16 @@ def create_lags(lags, all_features):
 
 lags = 10
 
-X = create_lags(lags, features)
-X_linear = create_lags(lags, features_lin_models)
+
+X = create_lags(lags, features, df)
+# Vynechani referencni urovne pro kategorie sentiment feature pro linearni modely
+X_linear = create_lags(lags, features_lin_models, df)
+
 features_names = X.columns
+
 
 y = df["log_return"]
 y_clf = (y > 0.005).astype(int)
-
 # Omezeni radku dle hodnoty LAG
 y, y_clf = y[lags:], y_clf[lags:]
 
@@ -82,6 +84,7 @@ window = 2630
 
 # -----Main walk forward loop-----
 # walk_forward_test(
+#     timeframe,
 #     X,
 #     X_linear,
 #     y,
