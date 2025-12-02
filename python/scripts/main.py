@@ -8,6 +8,10 @@ import os
 from python.scripts.services.walk_forward import walk_forward_test
 from python.scripts.services.evaluation import evaluate_class, evaluate_regg
 
+# TODO
+# regularizace L1 / L2 u linear models
+# mensi learning rate, pohrat si s hyperparametry - hlavne XGBOOST, LightGBM
+
 
 
 df = pd.read_csv('python/cleandata/processed_data.csv')
@@ -15,22 +19,6 @@ df = pd.read_csv('python/cleandata/processed_data.csv')
 # log return
 df["log_return"] = np.log(df['adjusted'] / df['adjusted'].shift(1))
 df.dropna(inplace=True)
-
-
-# DYNAMICKY PARAMETR TIMEFRAME
-# TODO
-# nastavit parametr při volání timeframe
-# predikce ukládat s označením timeframe
-# vytvářet rolling jen pri timeframe > 1 shift u log return taky
-
-# AGREGACE FEATURES NA 5 DENNI TIMEFRAME - rolling
-# TODO
-# https://chatgpt.com/share/692de068-8030-8000-83ae-cba5550092d3
-
-# regularizace L1 / L2 u linear models
-# mensi learning rate, max depth u tree models - hlavne XGBOOST, LightGBM
-# TODO
-
 
 
 features = [
@@ -41,8 +29,6 @@ features = [
     'bull_bear_spread_surv', 'volume', 'ema_20', 'basic_volatility', 'atr', 'macd',
     'obv', 'rsi', 'adx'
 ]
-
-
 features_lin_models = features.copy()
 features_lin_models.remove("sentiment_none")
 
