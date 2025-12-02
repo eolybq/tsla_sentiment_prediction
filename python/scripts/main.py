@@ -9,12 +9,9 @@ from python.scripts.services.walk_forward import walk_forward_test
 from python.scripts.services.evaluation import evaluate_class, evaluate_regg
 
 
+# TODO
+# mozna GD LR, XGBoost, LightGBM - overfitting?
 # regularizace L1 / L2 u linear models
-# mensi learning rate, max depth, min_samples_leaf, subsample u tree models - hlavne XGBOOST, LightGBM
-# TODO
-
-# MOZNA PROSTE NEJAK ZKUSIT JESTE TY ROLLING AGREGACE NA FEATURES
-# TODO
 
 
 
@@ -22,7 +19,7 @@ df = pd.read_csv('python/cleandata/processed_data.csv')
 
 
 # TIMEFRAME PRO VYPOCET LOG RETURN
-timeframe = 5
+TIMEFRAME = 5
 """
  = 1 → denní return
  = 5 → týdenní return
@@ -34,17 +31,29 @@ features = [
     # Unused
     # sma_20, sma_50, stochrsi, macd_signal, bb_up, bb_dn, g_trends
 
-    'log_return', 'vix', 'sentiment_neutral', 'sentiment_positive', 'sentiment_negative', 'sentiment_none',
-    'bull_bear_spread_surv', 'volume', 'ema_20', 'basic_volatility', 'atr', 'macd',
-    'obv', 'rsi', 'adx'
+    # Log return vstupuje jen v lag -> autoregresni feature
+    'log_return',
+    'vix',
+    'bull_bear_spread_surv',
+    'volume',
+    'ema_20',
+    'basic_volatility', 'atr','macd', 'obv', 'rsi', 'adx'
+    'sentiment_neutral', 'sentiment_positive', 'sentiment_negative', 'sentiment_none',
 ]
 features_lin_models = features.copy()
 features_lin_models.remove('sentiment_none')
 
 # log return
-df["log_return"] = np.log(df['adjusted'] / df['adjusted'].shift(timeframe))
+df["log_return"] = np.log(df['adjusted'] / df['adjusted'].shift(TIMEFRAME))
 df.dropna(inplace=True)
 
+
+# def timeframe_agg(all_features, df):
+#     if TIMEFRAME == 1:
+#         return df
+#
+#     df_out = df[list(all_features.keys())].rolling(window=TIMEFRAME).agg(all_features).dropna()
+#     return df_out
 
 # vytvoreni umele sekvence lagu -> kazdy radek obsahuje Pocet f * Pocet lags
 def create_lags(lags, all_features, df):
@@ -59,6 +68,7 @@ def create_lags(lags, all_features, df):
 
 lags = 10
 
+# df_final = timeframe_agg(features, df)
 
 X = create_lags(lags, features, df)
 # Vynechani referencni urovne pro kategorie sentiment feature pro linearni modely
@@ -83,16 +93,16 @@ window = 2630
 
 
 # -----Main walk forward loop-----
-# walk_forward_test(
-#     timeframe,
-#     X,
-#     X_linear,
-#     y,
-#     y_clf,
-#     window,
-#     gd_learning_rate,
-#     gd_epochs,
-# )
+walk_forward_test(
+    TIMEFRAME,
+    X,
+    X_linear,
+    y,
+    y_clf,
+    window,
+    gd_learning_rate,
+    gd_epochs,
+)
 
 
 # LOAD TRAINED MODELS AND PREDICTIONS:

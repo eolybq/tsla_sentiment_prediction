@@ -12,7 +12,7 @@ from xgboost import XGBClassifier, XGBRegressor
 # }
 
 # ------XGBOOST REGG-------
-def train_xgbr(X_train, X_test, y_train, obj='reg:squarederror', save=False, n_estimators=500, max_depth=5, l_rate=0.1):
+def train_xgbr(X_train, X_test, y_train, obj='reg:squarederror', save=False, n_estimators=500, max_depth=5, l_rate=0.05):
     print("-----TRAIN XGBoost Regressor-----")
 
     xgbr = XGBRegressor(objective=obj, n_estimators=n_estimators, max_depth=max_depth, learning_rate=l_rate, random_state=42, n_jobs=-1)

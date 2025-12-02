@@ -14,7 +14,7 @@ from lightgbm import LGBMRegressor, LGBMClassifier
 
 
 # -----LIGHTGBM REGG-------
-def train_lgbr(X_train, X_test, y_train, save=False, n_estimators=500, max_depth=5, l_rate=0.1):
+def train_lgbr(X_train, X_test, y_train, save=False, n_estimators=500, max_depth=5, l_rate=0.05):
     print("-----TRAIN LightGBM Regressor-----")
 
     lgbr = LGBMRegressor(n_estimators=n_estimators, max_depth=max_depth, learning_rate=l_rate, random_state=42, n_jobs=-1)
