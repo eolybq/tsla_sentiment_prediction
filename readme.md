@@ -1,4 +1,4 @@
-# Tesla Price Sentiment Based ML Prediction
+# Tesla Price Sentiment Based TimeSeries and ML models Prediction
 
 - **Part 1 of this project has its own report available (in Czech) in this file: [Report in PDF](r/report.pdf) or [Report in DOCX](r/report.docx)**
 
